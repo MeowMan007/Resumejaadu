@@ -44,10 +44,10 @@
           <label class="form-label mb-0">Description</label>
           {% if form.instance.pk %}
           <button type="button" class="ai-btn text-xs"
-                  hx-post="{% url 'ai:improve_field' %}"
-                  hx-vals='{"field": "project_description", "project_id": "{{ form.instance.pk }}", "resume_id": "{{ resume.pk }}"}'
-                  hx-target="#desc_{{ form.instance.pk }}"
-                  hx-swap="innerHTML">
+                  hx-post="{% url 'ai_assistant:enhance_project' %}"
+                  hx-vals='js:{"field_id": "{{ form.description.id_for_label }}", "text": document.getElementById("{{ form.description.id_for_label }}").value, "name": document.getElementById("{{ form.name.id_for_label }}").value, "tech_stack": document.getElementById("{{ form.tech_stack.id_for_label }}").value}'
+                  hx-target="#{{ form.description.id_for_label }}"
+                  hx-swap="outerHTML">
             ✨ AI Improve
           </button>
           {% endif %}

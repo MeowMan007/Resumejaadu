@@ -23,18 +23,18 @@
 
   <!-- Step Nav Pills -->
   <div class="flex flex-wrap gap-2 mb-8">
-    {% for s in steps %}
-    <a href="{% url 'resumes:wizard_step' pk=resume.pk step=s %}"
+    {% for s in steps_info %}
+    <a href="{% url 'resumes:wizard_step' pk=resume.pk step=s.id %}"
        class="px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-200
-              {% if s == step %}
+              {% if s.id == step %}
                 text-white
               {% elif forloop.counter0 <= resume.current_step %}
                 text-brand-400 hover:text-white
               {% else %}
                 text-slate-600 cursor-not-allowed pointer-events-none
               {% endif %}"
-       style="{% if s == step %}background: linear-gradient(135deg, #6366f1, #8b5cf6);{% elif forloop.counter0 <= resume.current_step %}background: rgba(99,102,241,0.12); border: 1px solid rgba(99,102,241,0.25);{% else %}background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);{% endif %}">
-      {{ step_titles|get_item:s|first_of }}
+       style="{% if s.id == step %}background: linear-gradient(135deg, #6366f1, #8b5cf6);{% elif forloop.counter0 <= resume.current_step %}background: rgba(99,102,241,0.12); border: 1px solid rgba(99,102,241,0.25);{% else %}background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);{% endif %}">
+      {{ s.title }}
     </a>
     {% endfor %}
   </div>

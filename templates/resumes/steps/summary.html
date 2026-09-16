@@ -10,10 +10,11 @@
       <label for="id_summary" class="form-label mb-0">Professional Summary</label>
       <button type="button" id="ai-summary-btn"
               class="ai-btn text-xs"
-              hx-post="{% url 'ai:improve_field' %}"
-              hx-vals='{"field": "summary", "resume_id": "{{ resume.pk }}", "target_role": "{{ resume.target_role }}"}'
+              hx-post="{% url 'ai_assistant:enhance_summary' %}"
+              hx-vals='{"field_id": "id_summary", "target_role": "{{ resume.target_role }}"}'
+              hx-include="[name='summary']"
               hx-target="#id_summary"
-              hx-swap="innerHTML"
+              hx-swap="outerHTML"
               hx-indicator="#ai-spin">
         <span id="ai-spin" class="htmx-indicator mr-1">⏳</span>
         ✨ Improve with AI

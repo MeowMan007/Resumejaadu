@@ -59,30 +59,34 @@
       <!-- Bullet points -->
       {% if bullet_fs %}
       <div class="mt-2">
-        <div class="flex items-center justify-between mb-2">
-          <label class="form-label mb-0 text-sm">Achievement Bullets</label>
-          <button type="button" class="ai-btn text-xs"
-                  hx-post="{% url 'ai:improve_bullets' %}"
-                  hx-vals='{"experience_id": "{{ form.instance.pk }}", "resume_id": "{{ resume.pk }}"}'
-                  hx-target="#bullets-{{ form.instance.pk }}"
-                  hx-swap="innerHTML">
-            ✨ AI Improve Bullets
-          </button>
-        </div>
+        <label class="form-label text-sm mb-2">Achievement Bullets</label>
         {{ bullet_fs.management_form }}
-        <div id="bullets-{{ form.instance.pk }}" class="space-y-2">
+        <div id="bullets-{{ form.instance.pk }}" class="space-y-4">
           {% for bf in bullet_fs %}
             {% for hidden in bf.hidden_fields %}{{ hidden }}{% endfor %}
             <div class="flex gap-2 items-start">
               <span class="text-slate-500 mt-2 text-sm">•</span>
-              {{ bf.text }}
-              {% if bf.instance.pk %}
-                <label class="text-xs text-red-400 mt-2 whitespace-nowrap cursor-pointer">
-                  {{ bf.DELETE }} del
-                </label>
-              {% endif %}
+              <div class="flex-1 space-y-1">
+                {{ bf.text }}
+                {% if bf.text.errors %}<p class="form-error">{{ bf.text.errors|join:", " }}</p>{% endif %}
+                <div class="flex items-center justify-between mt-1">
+                  {% if form.instance.pk %}
+                  <button type="button" class="ai-btn text-xs"
+                          hx-post="{% url 'ai_assistant:enhance_bullet' %}"
+                          hx-vals='js:{"field_id": "{{ bf.text.id_for_label }}", "text": document.getElementById("{{ bf.text.id_for_label }}").value, "role": document.getElementById("{{ form.role.id_for_label }}").value, "company": document.getElementById("{{ form.company.id_for_label }}").value}'
+                          hx-target="#{{ bf.text.id_for_label }}"
+                          hx-swap="outerHTML">
+                    ✨ AI Improve
+                  </button>
+                  {% endif %}
+                  {% if bf.instance.pk %}
+                    <label class="text-xs text-red-400 cursor-pointer">
+                      {{ bf.DELETE }} del
+                    </label>
+                  {% endif %}
+                </div>
+              </div>
             </div>
-            {% if bf.text.errors %}<p class="form-error">{{ bf.text.errors|join:", " }}</p>{% endif %}
           {% endfor %}
         </div>
       </div>

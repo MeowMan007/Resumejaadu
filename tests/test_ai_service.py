@@ -37,24 +37,17 @@ class AIServiceTest(TestCase):
         mock_completion.assert_called_once()
 
     @patch("apps.ai_assistant.service.litellm.completion")
-    def test_improve_bullets_returns_list(self, mock_completion):
-        mock_completion.return_value = self._make_mock_response(
-            "• Built X with 40% improvement\n• Led team of 5 engineers"
-        )
+    def test_enhance_bullet_returns_string(self, mock_completion):
+        mock_completion.return_value = self._make_mock_response("Built X with 40% improvement")
         from apps.ai_assistant.service import ResumeAIService
         svc = ResumeAIService()
-        result = svc.improve_bullets(
-            bullets=["Built X", "Led team"],
+        result = svc.enhance_bullet(
+            raw_text="Built X",
             role="Software Engineer",
             company="Acme",
-            target_role="Senior Engineer",
         )
-        # Should return a list of non-empty strings
-        self.assertIsInstance(result, list)
-        self.assertGreater(len(result), 0)
-        for bullet in result:
-            self.assertIsInstance(bullet, str)
-            self.assertTrue(len(bullet.strip()) > 0)
+        self.assertIsInstance(result, str)
+        self.assertEqual(result.strip(), "Built X with 40% improvement")
 
     @patch("apps.ai_assistant.service.litellm.completion")
     def test_improve_project_description(self, mock_completion):

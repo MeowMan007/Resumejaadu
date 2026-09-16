@@ -133,13 +133,18 @@ def wizard_step(request, pk: int, step: str):
 def _wizard_context(resume, step: str) -> dict:
     """Base context for all wizard steps."""
     step_idx = _get_step_index(step)
+    # Pre-calculate steps information for the template
+    steps_info = []
+    for s in WIZARD_STEPS:
+        title, _ = STEP_TITLES.get(s, ("", ""))
+        steps_info.append({"id": s, "title": title})
+
     return {
         "resume": resume,
         "step": step,
         "step_idx": step_idx,
         "step_count": len(WIZARD_STEPS),
-        "steps": WIZARD_STEPS,
-        "step_titles": STEP_TITLES,
+        "steps_info": steps_info,
         "title": STEP_TITLES.get(step, ("", ""))[0],
         "subtitle": STEP_TITLES.get(step, ("", ""))[1],
         "prev_step": WIZARD_STEPS[step_idx - 1] if step_idx > 0 else None,

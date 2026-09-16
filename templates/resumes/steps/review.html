@@ -113,11 +113,11 @@
       <div class="rounded-xl p-4 space-y-2"
            style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);">
         <p class="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">Edit Sections</p>
-        {% for s in steps %}
-        {% if s != 'review' %}
-        <a href="{% url 'resumes:wizard_step' pk=resume.pk step=s %}"
+        {% for s in steps_info %}
+        {% if s.id != 'review' %}
+        <a href="{% url 'resumes:wizard_step' pk=resume.pk step=s.id %}"
            class="flex items-center justify-between text-sm text-slate-400 hover:text-white transition-colors py-1 border-b border-white/5">
-          <span>{{ step_titles|get_item:s|first_of }}</span>
+          <span>{{ s.title }}</span>
           <span class="text-xs text-brand-400">Edit →</span>
         </a>
         {% endif %}
