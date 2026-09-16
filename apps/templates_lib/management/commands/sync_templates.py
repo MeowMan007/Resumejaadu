@@ -50,7 +50,7 @@ class Command(BaseCommand):
                 continue
 
             try:
-                with manifest_path.open() as f:
+                with manifest_path.open(encoding="utf-8-sig") as f:
                     data = json.load(f)
             except json.JSONDecodeError as exc:
                 self.stdout.write(self.style.ERROR(f"  ERROR {slug}: invalid JSON — {exc}"))
