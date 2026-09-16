@@ -1,0 +1,100 @@
+{% extends "resumes/wizard_base.html" %}
+{% block title %}Experience — {{ resume.title }}{% endblock %}
+
+{% block step_content %}
+<form method="post" id="wizard-form">
+  {% csrf_token %}
+  {{ formset.management_form }}
+
+  <div class="space-y-6" id="experience-container">
+    {% for form, bullet_fs in experience_with_bullets %}
+    <div class="experience-entry rounded-xl p-5 space-y-4"
+         style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);">
+
+      <!-- Delete checkbox -->
+      {% if form.instance.pk %}
+      <div class="flex justify-end">
+        <label class="flex items-center gap-2 text-xs text-red-400 cursor-pointer">
+          {{ form.DELETE }}
+          Remove this entry
+        </label>
+      </div>
+      {% endif %}
+
+      <!-- Hidden fields -->
+      {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
+      {{ form.order }}
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label class="form-label">Company</label>
+          {{ form.company }}
+          {% if form.company.errors %}<p class="form-error">{{ form.company.errors|join:", " }}</p>{% endif %}
+        </div>
+        <div>
+          <label class="form-label">Role / Title</label>
+          {{ form.role }}
+          {% if form.role.errors %}<p class="form-error">{{ form.role.errors|join:", " }}</p>{% endif %}
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div>
+          <label class="form-label">Location</label>
+          {{ form.location }}
+        </div>
+        <div>
+          <label class="form-label">Start Date</label>
+          {{ form.start_date }}
+        </div>
+        <div>
+          <label class="form-label">End Date</label>
+          {{ form.end_date }}
+          <label class="flex items-center gap-2 mt-1 text-xs text-slate-400">
+            {{ form.is_current }} Currently here
+          </label>
+        </div>
+      </div>
+
+      <!-- Bullet points -->
+      {% if bullet_fs %}
+      <div class="mt-2">
+        <div class="flex items-center justify-between mb-2">
+          <label class="form-label mb-0 text-sm">Achievement Bullets</label>
+          <button type="button" class="ai-btn text-xs"
+                  hx-post="{% url 'ai:improve_bullets' %}"
+                  hx-vals='{"experience_id": "{{ form.instance.pk }}", "resume_id": "{{ resume.pk }}"}'
+                  hx-target="#bullets-{{ form.instance.pk }}"
+                  hx-swap="innerHTML">
+            ✨ AI Improve Bullets
+          </button>
+        </div>
+        {{ bullet_fs.management_form }}
+        <div id="bullets-{{ form.instance.pk }}" class="space-y-2">
+          {% for bf in bullet_fs %}
+            {% for hidden in bf.hidden_fields %}{{ hidden }}{% endfor %}
+            <div class="flex gap-2 items-start">
+              <span class="text-slate-500 mt-2 text-sm">•</span>
+              {{ bf.text }}
+              {% if bf.instance.pk %}
+                <label class="text-xs text-red-400 mt-2 whitespace-nowrap cursor-pointer">
+                  {{ bf.DELETE }} del
+                </label>
+              {% endif %}
+            </div>
+            {% if bf.text.errors %}<p class="form-error">{{ bf.text.errors|join:", " }}</p>{% endif %}
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+    </div>
+    {% empty %}
+    <p class="text-center text-slate-500 py-6">No experience entries yet. Add your first below.</p>
+    {% endfor %}
+  </div>
+
+  <div class="mt-4 flex justify-end">
+    <button type="submit" name="save_draft" value="1" class="btn-secondary text-sm">Save Draft</button>
+  </div>
+</form>
+{% endblock %}

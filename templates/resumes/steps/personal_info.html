@@ -1,0 +1,104 @@
+{% extends "resumes/wizard_base.html" %}
+{% block title %}Personal Info — {{ resume.title }}{% endblock %}
+
+{% block step_content %}
+<form method="post" enctype="multipart/form-data" id="wizard-form" class="space-y-6">
+  {% csrf_token %}
+
+  {% if form.non_field_errors %}
+  <div class="rounded-lg bg-red-900/30 border border-red-800 px-4 py-3 text-sm text-red-300">
+    {{ form.non_field_errors }}
+  </div>
+  {% endif %}
+
+  <!-- Name + Email row -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <div>
+      <label for="id_full_name" class="form-label">Full Name <span class="text-red-400">*</span></label>
+      {{ form.full_name }}
+      {% if form.full_name.errors %}<p class="form-error">{{ form.full_name.errors|join:", " }}</p>{% endif %}
+    </div>
+    <div>
+      <label for="id_email" class="form-label">Email <span class="text-red-400">*</span></label>
+      {{ form.email }}
+      {% if form.email.errors %}<p class="form-error">{{ form.email.errors|join:", " }}</p>{% endif %}
+    </div>
+  </div>
+
+  <!-- Phone + Location row -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <div>
+      <label for="id_phone" class="form-label">Phone</label>
+      {{ form.phone }}
+    </div>
+    <div>
+      <label for="id_location" class="form-label">Location</label>
+      {{ form.location }}
+    </div>
+  </div>
+
+  <!-- Social links -->
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+    <div>
+      <label for="id_linkedin_url" class="form-label">LinkedIn</label>
+      {{ form.linkedin_url }}
+    </div>
+    <div>
+      <label for="id_github_url" class="form-label">GitHub</label>
+      {{ form.github_url }}
+    </div>
+    <div>
+      <label for="id_portfolio_url" class="form-label">Portfolio</label>
+      {{ form.portfolio_url }}
+    </div>
+  </div>
+
+  <!-- Summary with AI enhance button -->
+  <div>
+    <div class="flex items-center justify-between mb-1">
+      <label for="id_summary" class="form-label mb-0">Professional Summary</label>
+      <button type="button" id="ai-summary-btn"
+              class="ai-btn text-xs"
+              hx-post="{% url 'ai:improve_field' %}"
+              hx-vals='{"field": "summary", "resume_id": "{{ resume.pk }}"}'
+              hx-target="#id_summary"
+              hx-swap="innerHTML"
+              hx-indicator="#ai-summary-spinner">
+        <span id="ai-summary-spinner" class="htmx-indicator">⏳</span>
+        ✨ Improve with AI
+      </button>
+    </div>
+    {{ form.summary }}
+    {% if form.summary.errors %}<p class="form-error">{{ form.summary.errors|join:", " }}</p>{% endif %}
+    <p class="mt-1 text-xs text-slate-500">2–3 sentences. AI can help you write this.</p>
+  </div>
+
+  <!-- Photo upload -->
+  <div>
+    <label class="form-label">Headshot Photo <span class="text-slate-500 font-normal">(optional)</span></label>
+    <div class="flex items-center gap-4">
+      {% if form.instance.photo %}
+        <img src="{{ form.instance.photo.url }}" alt="Current photo"
+             class="w-16 h-16 rounded-full object-cover border-2 border-brand-500/30" />
+      {% else %}
+        <div class="w-16 h-16 rounded-full flex items-center justify-center text-2xl"
+             style="background: rgba(99,102,241,0.12); border: 1px dashed rgba(99,102,241,0.3);">
+          👤
+        </div>
+      {% endif %}
+      <div>
+        {{ form.photo }}
+        {% if form.photo.errors %}<p class="form-error">{{ form.photo.errors|join:", " }}</p>{% endif %}
+        <p class="mt-1 text-xs text-slate-500">JPEG/PNG/WebP · Max 5MB · Only for photo-supporting templates.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Save only button -->
+  <div class="flex justify-end">
+    <button type="submit" name="save_draft" value="1" class="btn-secondary text-sm">
+      Save Draft
+    </button>
+  </div>
+</form>
+{% endblock %}

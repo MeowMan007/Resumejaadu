@@ -1,0 +1,134 @@
+{% extends "resumes/wizard_base.html" %}
+{% block title %}Review & Download — {{ resume.title }}{% endblock %}
+
+{% block step_content %}
+<div class="space-y-6">
+
+  <!-- Summary preview card -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+    <!-- Left: Data summary -->
+    <div class="space-y-4 text-sm text-slate-300">
+
+      <!-- Personal -->
+      {% if personal %}
+      <div>
+        <h3 class="font-display font-semibold text-white mb-1">👤 {{ personal.full_name }}</h3>
+        <p class="text-slate-400">{{ personal.email }} {% if personal.phone %}· {{ personal.phone }}{% endif %}</p>
+        {% if personal.location %}<p class="text-slate-400">📍 {{ personal.location }}</p>{% endif %}
+        {% if personal.summary %}
+        <p class="mt-2 text-slate-300 leading-relaxed text-xs border-l-2 border-brand-500/40 pl-3">{{ personal.summary|truncatechars:280 }}</p>
+        {% endif %}
+      </div>
+      {% endif %}
+
+      <!-- Experience -->
+      {% if experience %}
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Experience</p>
+        {% for exp in experience %}
+        <div class="mb-1">
+          <span class="font-medium text-slate-200">{{ exp.role }}</span>
+          <span class="text-slate-500"> at {{ exp.company }}</span>
+          {% if exp.start_date %}<span class="text-slate-600 text-xs ml-1">({{ exp.start_date|date:"M Y" }} – {% if exp.is_current %}Present{% else %}{{ exp.end_date|date:"M Y" }}{% endif %})</span>{% endif %}
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <!-- Education -->
+      {% if education %}
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Education</p>
+        {% for edu in education %}
+        <div class="mb-1">
+          <span class="font-medium text-slate-200">{{ edu.degree }}</span>
+          <span class="text-slate-500"> · {{ edu.institution }}</span>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <!-- Skills -->
+      {% if skills %}
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Skills</p>
+        {% for sc in skills %}
+        <div class="flex gap-2 mb-1 flex-wrap">
+          <span class="text-slate-400 font-medium">{{ sc.name }}:</span>
+          {% for item in sc.items %}
+          <span class="px-2 py-0.5 rounded text-xs" style="background:rgba(99,102,241,0.12);border:1px solid rgba(99,102,241,0.2);color:#a5b4fc;">{{ item }}</span>
+          {% endfor %}
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <!-- Template info -->
+      <div class="pt-2 border-t border-white/5">
+        <p class="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Selected Template</p>
+        {% if resume.template %}
+        <span class="text-slate-200">{{ resume.template.name }}</span>
+        <span class="text-slate-500 text-xs"> ({{ resume.template.get_engine_display }})</span>
+        {% else %}
+        <span class="text-amber-400 text-xs">⚠ No template selected — go back to the Template step.</span>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Right: PDF Generation panel -->
+    <div class="flex flex-col gap-4">
+      <div class="rounded-xl p-5 text-center space-y-4"
+           style="background: rgba(99,102,241,0.06); border: 1px solid rgba(99,102,241,0.2);">
+
+        <h2 class="font-display font-bold text-white">Generate PDF</h2>
+        <p class="text-slate-400 text-sm">Compile your resume through LaTeX to get a pixel-perfect PDF.</p>
+
+        {% if resume.template %}
+        <button id="generate-btn"
+                hx-post="{% url 'resumes:generate_pdf' pk=resume.pk %}"
+                hx-target="#pdf-status-panel"
+                hx-swap="innerHTML"
+                class="btn-primary w-full justify-center text-center">
+          ⚡ Generate PDF
+        </button>
+        {% else %}
+        <a href="{% url 'resumes:wizard_step' pk=resume.pk step='template' %}"
+           class="btn-secondary w-full text-center block">
+          ← Select a Template First
+        </a>
+        {% endif %}
+
+        <!-- Status panel -->
+        <div id="pdf-status-panel">
+          {% if latest_pdf %}
+            {% include "resumes/partials/pdf_status.html" with gen=latest_pdf resume=resume %}
+          {% else %}
+            <p class="text-slate-500 text-sm">No PDFs generated yet.</p>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Edit links -->
+      <div class="rounded-xl p-4 space-y-2"
+           style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);">
+        <p class="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">Edit Sections</p>
+        {% for s in steps %}
+        {% if s != 'review' %}
+        <a href="{% url 'resumes:wizard_step' pk=resume.pk step=s %}"
+           class="flex items-center justify-between text-sm text-slate-400 hover:text-white transition-colors py-1 border-b border-white/5">
+          <span>{{ step_titles|get_item:s|first_of }}</span>
+          <span class="text-xs text-brand-400">Edit →</span>
+        </a>
+        {% endif %}
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block nav_buttons %}
+<!-- No submit button on review step — actions are in the panel -->
+<div></div>
+{% endblock %}

@@ -1,0 +1,76 @@
+{% extends "resumes/wizard_base.html" %}
+{% block title %}Education — {{ resume.title }}{% endblock %}
+
+{% block step_content %}
+<form method="post" id="wizard-form">
+  {% csrf_token %}
+  {{ formset.management_form }}
+
+  <div class="space-y-5" id="education-container">
+    {% for form in formset %}
+    <div class="rounded-xl p-5 space-y-4"
+         style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);">
+
+      {% if form.instance.pk %}
+      <div class="flex justify-end">
+        <label class="flex items-center gap-2 text-xs text-red-400 cursor-pointer">
+          {{ form.DELETE }} Remove
+        </label>
+      </div>
+      {% endif %}
+
+      {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
+      {{ form.order }}
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label class="form-label">Institution</label>
+          {{ form.institution }}
+          {% if form.institution.errors %}<p class="form-error">{{ form.institution.errors|join:", " }}</p>{% endif %}
+        </div>
+        <div>
+          <label class="form-label">Degree</label>
+          {{ form.degree }}
+          {% if form.degree.errors %}<p class="form-error">{{ form.degree.errors|join:", " }}</p>{% endif %}
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <label class="form-label">Field of Study</label>
+          {{ form.field_of_study }}
+        </div>
+        <div>
+          <label class="form-label">Location</label>
+          {{ form.location }}
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div>
+          <label class="form-label">Start Date</label>
+          {{ form.start_date }}
+        </div>
+        <div>
+          <label class="form-label">End Date</label>
+          {{ form.end_date }}
+          <label class="flex items-center gap-2 mt-1 text-xs text-slate-400">
+            {{ form.is_current }} Currently enrolled
+          </label>
+        </div>
+        <div>
+          <label class="form-label">GPA <span class="text-slate-500 font-normal">(optional)</span></label>
+          {{ form.gpa }}
+        </div>
+      </div>
+    </div>
+    {% empty %}
+    <p class="text-center text-slate-500 py-6">No education entries yet.</p>
+    {% endfor %}
+  </div>
+
+  <div class="mt-4 flex justify-end">
+    <button type="submit" name="save_draft" value="1" class="btn-secondary text-sm">Save Draft</button>
+  </div>
+</form>
+{% endblock %}

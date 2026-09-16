@@ -1,0 +1,49 @@
+{% extends "resumes/wizard_base.html" %}
+{% block title %}Summary — {{ resume.title }}{% endblock %}
+
+{% block step_content %}
+<form method="post" id="wizard-form" class="space-y-6">
+  {% csrf_token %}
+
+  <div>
+    <div class="flex items-center justify-between mb-2">
+      <label for="id_summary" class="form-label mb-0">Professional Summary</label>
+      <button type="button" id="ai-summary-btn"
+              class="ai-btn text-xs"
+              hx-post="{% url 'ai:improve_field' %}"
+              hx-vals='{"field": "summary", "resume_id": "{{ resume.pk }}", "target_role": "{{ resume.target_role }}"}'
+              hx-target="#id_summary"
+              hx-swap="innerHTML"
+              hx-indicator="#ai-spin">
+        <span id="ai-spin" class="htmx-indicator mr-1">⏳</span>
+        ✨ Improve with AI
+      </button>
+    </div>
+    <textarea id="id_summary" name="summary" rows="6"
+              class="form-textarea w-full"
+              placeholder="A results-driven software engineer with 5+ years of experience building scalable web applications...">{{ personal_info.summary }}</textarea>
+    <p class="mt-2 text-xs text-slate-500">
+      Tip: 2–3 sentences. Quantify your impact. AI can rewrite this for your target role:
+      <strong class="text-slate-300">{{ resume.target_role|default:"(no role set)" }}</strong>
+    </p>
+  </div>
+
+  <!-- Live character counter -->
+  <div class="flex justify-between items-center text-xs text-slate-500">
+    <span id="char-count">0 characters</span>
+    <span class="text-amber-400">Aim for 200–400 characters</span>
+  </div>
+
+  <div class="flex justify-end">
+    <button type="submit" name="save_draft" value="1" class="btn-secondary text-sm">Save Draft</button>
+  </div>
+</form>
+
+<script>
+  const ta = document.getElementById('id_summary');
+  const counter = document.getElementById('char-count');
+  function updateCount() { counter.textContent = ta.value.length + ' characters'; }
+  ta.addEventListener('input', updateCount);
+  updateCount();
+</script>
+{% endblock %}

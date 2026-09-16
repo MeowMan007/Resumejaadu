@@ -1,0 +1,55 @@
+{% extends "resumes/wizard_base.html" %}
+{% block title %}Skills — {{ resume.title }}{% endblock %}
+
+{% block step_content %}
+<form method="post" id="wizard-form">
+  {% csrf_token %}
+  {{ formset.management_form }}
+
+  <p class="text-slate-400 text-sm mb-4">
+    Group your skills by category (e.g. Languages, Frameworks, Tools). Enter each skill comma-separated.
+  </p>
+
+  <div class="space-y-4" id="skills-container">
+    {% for form in formset %}
+    <div class="rounded-xl p-4 space-y-3"
+         style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);">
+
+      {% if form.instance.pk %}
+      <div class="flex justify-end">
+        <label class="flex items-center gap-2 text-xs text-red-400 cursor-pointer">
+          {{ form.DELETE }} Remove category
+        </label>
+      </div>
+      {% endif %}
+
+      {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
+      {{ form.order }}
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
+        <div>
+          <label class="form-label text-sm">Category Name</label>
+          {{ form.name }}
+          {% if form.name.errors %}<p class="form-error">{{ form.name.errors|join:", " }}</p>{% endif %}
+        </div>
+        <div class="sm:col-span-2">
+          <label class="form-label text-sm">Skills <span class="text-slate-500 font-normal">(comma-separated)</span></label>
+          {{ form.items_text }}
+        </div>
+      </div>
+    </div>
+    {% empty %}
+    <p class="text-center text-slate-500 py-4">No skill categories yet.</p>
+    {% endfor %}
+  </div>
+
+  <div class="mt-4 text-xs text-slate-500 p-3 rounded-lg"
+       style="background: rgba(99,102,241,0.06); border: 1px solid rgba(99,102,241,0.15);">
+    💡 <strong class="text-slate-300">Tip:</strong> ATS parsers love skill sections. Add at least one category with 5+ skills relevant to your target role.
+  </div>
+
+  <div class="mt-4 flex justify-end">
+    <button type="submit" name="save_draft" value="1" class="btn-secondary text-sm">Save Draft</button>
+  </div>
+</form>
+{% endblock %}
