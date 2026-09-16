@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}ResumeJaadu — AI-Powered Resume Builder{% endblock %}</title>
+  <meta name="description" content="{% block meta_description %}Build stunning, ATS-optimized resumes in minutes with AI assistance. Choose from 20 professional LaTeX templates.{% endblock %}" />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Space Grotesk', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#f0f4ff',
+              100: '#e0e9ff',
+              200: '#c7d7fe',
+              300: '#a5b8fc',
+              400: '#818cf8',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              800: '#3730a3',
+              900: '#312e81',
+            },
+            accent: {
+              400: '#34d399',
+              500: '#10b981',
+              600: '#059669',
+            },
+            dark: {
+              900: '#0a0a0f',
+              800: '#111118',
+              700: '#1a1a2e',
+              600: '#16213e',
+              500: '#1f2744',
+              400: '#2a3352',
+            }
+          },
+          backgroundImage: {
+            'hero-gradient': 'linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #16213e 100%)',
+            'card-gradient': 'linear-gradient(145deg, rgba(99,102,241,0.1) 0%, rgba(16,185,129,0.05) 100%)',
+            'brand-gradient': 'linear-gradient(135deg, #6366f1, #8b5cf6, #ec4899)',
+          },
+          animation: {
+            'fade-in': 'fadeIn 0.5s ease-out',
+            'slide-up': 'slideUp 0.4s ease-out',
+            'pulse-slow': 'pulse 3s infinite',
+            'shimmer': 'shimmer 2s infinite',
+          },
+          keyframes: {
+            fadeIn: { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
+            slideUp: { '0%': { opacity: '0', transform: 'translateY(20px)' }, '100%': { opacity: '1', transform: 'translateY(0)' } },
+            shimmer: { '0%': { backgroundPosition: '-200% 0' }, '100%': { backgroundPosition: '200% 0' } },
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- HTMX -->
+  <script src="https://unpkg.com/htmx.org@2.0.3" integrity="sha384-0895/pl2MU10Hqc6jd4RvrthNlDiE9U1tWmX7WRESftEDRosgxNsQG/Ze9YMRzHq" crossorigin="anonymous" defer></script>
+
+  <!-- Alpine.js -->
+  <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+  <style>
+    /* ── Custom Styles ─────────────────────────────── */
+    * { box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #0a0a0f;
+      color: #e2e8f0;
+      min-height: 100vh;
+    }
+
+    /* Form inputs */
+    .form-input {
+      @apply w-full bg-dark-700 border border-white/10 rounded-xl px-4 py-3
+             text-slate-100 placeholder-slate-500
+             focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent
+             transition-all duration-200;
+    }
+    .form-textarea {
+      @apply w-full bg-dark-700 border border-white/10 rounded-xl px-4 py-3
+             text-slate-100 placeholder-slate-500 resize-y
+             focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-transparent
+             transition-all duration-200;
+    }
+    .form-file {
+      @apply w-full text-slate-400 file:mr-4 file:py-2 file:px-4
+             file:rounded-lg file:border-0 file:bg-brand-600 file:text-white
+             file:cursor-pointer file:transition-colors hover:file:bg-brand-700;
+    }
+
+    /* Buttons */
+    .btn-primary {
+      @apply inline-flex items-center gap-2 px-6 py-3 bg-brand-gradient
+             text-white font-semibold rounded-xl
+             hover:opacity-90 active:scale-95
+             transition-all duration-200 shadow-lg shadow-brand-900/40;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    }
+    .btn-secondary {
+      @apply inline-flex items-center gap-2 px-6 py-3
+             bg-white/5 border border-white/10 text-slate-300 font-medium rounded-xl
+             hover:bg-white/10 hover:text-white
+             transition-all duration-200;
+    }
+    .btn-danger {
+      @apply inline-flex items-center gap-2 px-4 py-2
+             bg-red-600/20 border border-red-500/30 text-red-400 font-medium rounded-lg
+             hover:bg-red-600/30 hover:text-red-300
+             transition-all duration-200;
+    }
+    .btn-ai {
+      @apply inline-flex items-center gap-2 px-4 py-2
+             text-sm font-medium rounded-lg
+             transition-all duration-200;
+      background: linear-gradient(135deg, rgba(99,102,241,0.2), rgba(139,92,246,0.2));
+      border: 1px solid rgba(99,102,241,0.4);
+      color: #a5b4fc;
+    }
+    .btn-ai:hover {
+      background: linear-gradient(135deg, rgba(99,102,241,0.35), rgba(139,92,246,0.35));
+      color: #c7d2fe;
+    }
+
+    /* Card */
+    .card {
+      @apply bg-dark-700 border border-white/8 rounded-2xl p-6;
+      background: linear-gradient(145deg, rgba(26,26,46,0.95) 0%, rgba(22,33,62,0.8) 100%);
+    }
+    .card-hover {
+      @apply card transition-all duration-300
+             hover:border-brand-500/40 hover:shadow-xl hover:shadow-brand-900/20
+             hover:-translate-y-0.5;
+    }
+
+    /* Glassmorphism */
+    .glass {
+      backdrop-filter: blur(16px);
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    /* Wizard progress bar */
+    .progress-bar {
+      @apply h-1 bg-dark-600 rounded-full overflow-hidden;
+    }
+    .progress-fill {
+      @apply h-full rounded-full transition-all duration-500;
+      background: linear-gradient(90deg, #6366f1, #8b5cf6, #ec4899);
+    }
+
+    /* AI button loading state */
+    .ai-loading {
+      animation: shimmer 1.5s infinite;
+      background: linear-gradient(90deg, rgba(99,102,241,0.2) 25%, rgba(139,92,246,0.4) 50%, rgba(99,102,241,0.2) 75%);
+      background-size: 200% 100%;
+    }
+
+    /* Toast/messages */
+    .toast {
+      @apply fixed top-4 right-4 z-50 px-5 py-3 rounded-xl text-sm font-medium shadow-xl
+             animate-slide-up;
+    }
+    .toast-success { @apply toast bg-accent-500 text-white; }
+    .toast-error { @apply toast bg-red-600 text-white; }
+
+    /* AI error response */
+    .ai-error {
+      @apply text-sm text-amber-400 bg-amber-900/20 border border-amber-500/30
+             rounded-lg px-4 py-2 mt-2;
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #111118; }
+    ::-webkit-scrollbar-thumb { background: #2a3352; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #4f46e5; }
+
+    /* Navigation */
+    .nav-link {
+      @apply text-slate-400 hover:text-white transition-colors duration-200 text-sm font-medium;
+    }
+
+    /* Glow effect on interactive elements */
+    .glow-brand:focus, .glow-brand:hover {
+      box-shadow: 0 0 20px rgba(99,102,241,0.4);
+    }
+  </style>
+
+  {% block extra_head %}{% endblock %}
+</head>
+<body class="antialiased" hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+
+  <!-- Navigation -->
+  <nav class="fixed top-0 left-0 right-0 z-40 glass border-b border-white/5">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+
+        <!-- Logo -->
+        <a href="{% url 'resumes:landing' %}" class="flex items-center gap-2 group">
+          <div class="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm"
+               style="background: linear-gradient(135deg, #6366f1, #8b5cf6);">R</div>
+          <span class="font-display font-bold text-lg text-white group-hover:text-brand-400 transition-colors">
+            Resume<span class="text-brand-400">Jaadu</span>
+          </span>
+        </a>
+
+        <!-- Nav Links -->
+        <div class="flex items-center gap-6">
+          {% if user.is_authenticated %}
+            <a href="{% url 'resumes:dashboard' %}" class="nav-link">Dashboard</a>
+            <a href="{% url 'resumes:create_resume' %}" class="btn-primary text-sm px-4 py-2">+ New Resume</a>
+            <div class="relative" x-data="{ open: false }">
+              <button @click="open = !open"
+                      class="flex items-center gap-2 text-slate-300 hover:text-white transition-colors">
+                <div class="w-8 h-8 rounded-full bg-brand-600 flex items-center justify-center text-xs font-bold">
+                  {{ user.email|first|upper }}
+                </div>
+              </button>
+              <div x-show="open" @click.away="open = false"
+                   x-transition
+                   class="absolute right-0 mt-2 w-48 glass rounded-xl shadow-xl border border-white/10 overflow-hidden">
+                <div class="px-4 py-3 border-b border-white/10">
+                  <p class="text-xs text-slate-400">Signed in as</p>
+                  <p class="text-sm text-white truncate">{{ user.email }}</p>
+                </div>
+                <a href="{% url 'account_logout' %}"
+                   class="block px-4 py-3 text-sm text-red-400 hover:bg-red-600/10 transition-colors">
+                  Sign out
+                </a>
+              </div>
+            </div>
+          {% else %}
+            <a href="{% url 'account_login' %}" class="nav-link">Sign in</a>
+            <a href="{% url 'account_signup' %}" class="btn-primary text-sm px-4 py-2">Get Started Free</a>
+          {% endif %}
+        </div>
+
+      </div>
+    </div>
+  </nav>
+
+  <!-- Django Messages -->
+  {% if messages %}
+  <div class="fixed top-20 right-4 z-50 flex flex-col gap-2" x-data>
+    {% for message in messages %}
+    <div class="{% if message.tags == 'success' %}toast-success{% else %}toast-error{% endif %} flex items-center gap-3"
+         x-data="{ show: true }"
+         x-show="show"
+         x-transition
+         x-init="setTimeout(() => show = false, 4000)">
+      {% if message.tags == 'success' %}✓{% else %}⚠{% endif %}
+      {{ message }}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- Main Content -->
+  <main class="pt-16 min-h-screen">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Footer -->
+  <footer class="border-t border-white/5 py-8 mt-16">
+    <div class="max-w-7xl mx-auto px-4 text-center text-slate-500 text-sm">
+      <p>Built with ❤️ using Django, Celery, and free AI (Groq + Ollama)</p>
+      <p class="mt-1">
+        <a href="https://github.com/MeowMan007/Resumejaadu" class="hover:text-brand-400 transition-colors" target="_blank">
+          View on GitHub ↗
+        </a>
+      </p>
+    </div>
+  </footer>
+
+  <!-- Global HTMX config -->
+  <script>
+    // HTMX: show indicator while AI calls are in flight
+    document.addEventListener('htmx:beforeRequest', (e) => {
+      const btn = e.detail.elt;
+      if (btn.classList.contains('btn-ai')) {
+        btn.innerHTML = '<span class="animate-spin">⟳</span> Improving…';
+        btn.disabled = true;
+      }
+    });
+    document.addEventListener('htmx:afterRequest', (e) => {
+      const btn = e.detail.elt;
+      if (btn.classList.contains('btn-ai') && btn.disabled) {
+        btn.innerHTML = '✨ Improve with AI';
+        btn.disabled = false;
+      }
+    });
+  </script>
+
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

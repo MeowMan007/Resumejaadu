@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+{% block title %}My Resumes — ResumeJaadu{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+
+  <!-- Header -->
+  <div class="flex items-center justify-between mb-10">
+    <div>
+      <h1 class="font-display text-3xl font-bold text-white">My Resumes</h1>
+      <p class="text-slate-400 mt-1">{{ resumes.count }} resume{{ resumes.count|pluralize }} in your account</p>
+    </div>
+    <a href="{% url 'resumes:create_resume' %}" class="btn-primary">
+      + New Resume
+    </a>
+  </div>
+
+  <!-- Resume Grid -->
+  {% if resumes %}
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    {% for resume in resumes %}
+    <div class="card-hover group animate-fade-in" style="animation-delay: {{ forloop.counter0 }}00ms;">
+
+      <!-- Thumbnail / Preview -->
+      <div class="aspect-[3/4] rounded-xl mb-4 flex items-center justify-center overflow-hidden relative"
+           style="background: linear-gradient(145deg, #1a1a2e, #16213e);">
+        {% with latest=resume.latest_pdf %}
+        {% if latest and latest.thumbnail %}
+          <img src="{{ latest.thumbnail.url }}" alt="{{ resume.title }} preview"
+               class="w-full h-full object-cover" />
+        {% else %}
+          <!-- Placeholder preview -->
+          <div class="text-center p-6">
+            <div class="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-3"
+                 style="background: rgba(99,102,241,0.2); border: 1px solid rgba(99,102,241,0.3);">
+              <span class="text-2xl">📄</span>
+            </div>
+            <p class="text-xs text-slate-500">
+              {% if latest %}
+                {{ latest.get_status_display }}…
+              {% else %}
+                Not yet generated
+              {% endif %}
+            </p>
+          </div>
+        {% endif %}
+        {% endwith %}
+
+        <!-- Status badge -->
+        <div class="absolute top-3 right-3">
+          {% if resume.status == "final" %}
+            <span class="px-2 py-1 text-xs rounded-full bg-accent-500/20 text-accent-400 border border-accent-500/30">Final</span>
+          {% else %}
+            <span class="px-2 py-1 text-xs rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30">Draft</span>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Resume Info -->
+      <div class="mb-4">
+        <h2 class="font-display font-semibold text-white text-lg truncate group-hover:text-brand-400 transition-colors">
+          {{ resume.title }}
+        </h2>
+        {% if resume.personal_info %}
+          <p class="text-slate-400 text-sm truncate">{{ resume.personal_info.full_name }}</p>
+        {% endif %}
+        {% if resume.template %}
+          <p class="text-slate-500 text-xs mt-1">
+            {{ resume.template.name }} · {{ resume.template.get_engine_display }}
+          </p>
+        {% else %}
+          <p class="text-slate-500 text-xs mt-1 italic">No template selected yet</p>
+        {% endif %}
+        <p class="text-slate-600 text-xs mt-1">Updated {{ resume.updated_at|timesince }} ago</p>
+      </div>
+
+      <!-- Progress -->
+      <div class="mb-4">
+        <div class="flex items-center justify-between text-xs text-slate-500 mb-1">
+          <span>Progress</span>
+          <span>Step {{ resume.current_step }}/9</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" style="width: {% widthratio resume.current_step 9 100 %}%;"></div>
+        </div>
+      </div>
+
+      <!-- Actions -->
+      <div class="flex gap-2 flex-wrap">
+        <a href="{% url 'resumes:wizard_step' pk=resume.pk step='personal-info' %}"
+           class="btn-secondary text-sm py-2 flex-1 text-center">
+          ✏️ Edit
+        </a>
+
+        {% with latest=resume.latest_pdf %}
+        {% if latest and latest.status == "success" %}
+          <a href="{% url 'resumes:download_pdf' pk=resume.pk gen_pk=latest.pk %}"
+             class="btn-ai text-sm py-2 flex-1 text-center">
+            ⬇ Download
+          </a>
+        {% else %}
+          <button
+            hx-post="{% url 'resumes:generate_pdf' pk=resume.pk %}"
+            hx-swap="none"
+            onclick="handleGenerate(this, {{ resume.pk }})"
+            class="btn-ai text-sm py-2 flex-1 text-center">
+            🔄 Generate PDF
+          </button>
+        {% endif %}
+        {% endwith %}
+
+        <form method="post" action="{% url 'resumes:duplicate_resume' pk=resume.pk %}"
+              class="inline">
+          {% csrf_token %}
+          <button type="submit" class="btn-secondary text-sm py-2 px-3" title="Duplicate">⧉</button>
+        </form>
+
+        <form method="post" action="{% url 'resumes:delete_resume' pk=resume.pk %}"
+              class="inline"
+              onsubmit="return confirm('Delete this resume? This cannot be undone.')">
+          {% csrf_token %}
+          <button type="submit" class="btn-danger text-sm py-2 px-3" title="Delete">🗑</button>
+        </form>
+      </div>
+
+    </div>
+    {% endfor %}
+  </div>
+
+  {% else %}
+  <!-- Empty State -->
+  <div class="text-center py-32 animate-fade-in">
+    <div class="w-24 h-24 rounded-3xl flex items-center justify-center mx-auto mb-6"
+         style="background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(139,92,246,0.15)); border: 1px solid rgba(99,102,241,0.25);">
+      <span class="text-4xl">✨</span>
+    </div>
+    <h2 class="font-display text-2xl font-bold text-white mb-3">No resumes yet</h2>
+    <p class="text-slate-400 mb-8 max-w-md mx-auto">
+      Create your first AI-powered resume. The wizard guides you through every step, and AI helps at every text field.
+    </p>
+    <a href="{% url 'resumes:create_resume' %}" class="btn-primary text-base px-8 py-4">
+      ✨ Create My First Resume
+    </a>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function handleGenerate(btn, resumeId) {
+  btn.textContent = '⟳ Generating…';
+  btn.disabled = true;
+  fetch(`/resume/${resumeId}/generate-pdf/`, {
+    method: 'POST',
+    headers: { 'X-CSRFToken': document.cookie.match(/csrftoken=([^;]+)/)?.[1] || '' }
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.poll_url) pollStatus(data.poll_url, btn, resumeId, data.generated_pdf_id);
+  })
+  .catch(() => { btn.textContent = '⚠ Error'; btn.disabled = false; });
+}
+
+function pollStatus(url, btn, resumeId, genId) {
+  const interval = setInterval(() => {
+    fetch(url)
+    .then(r => r.json())
+    .then(data => {
+      if (data.status === 'success') {
+        clearInterval(interval);
+        btn.textContent = '⬇ Download';
+        btn.disabled = false;
+        btn.onclick = null;
+        btn.setAttribute('href', `/resume/${resumeId}/download/${genId}/`);
+        location.reload();
+      } else if (data.status === 'failed') {
+        clearInterval(interval);
+        btn.textContent = '⚠ Failed — Retry';
+        btn.disabled = false;
+      }
+    });
+  }, 2000);
+}
+</script>
+{% endblock %}

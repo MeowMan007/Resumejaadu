@@ -1,0 +1,44 @@
+# Django Core
+Django==5.1.4
+django-environ==0.11.2
+django-allauth==65.3.0
+psycopg2-binary==2.9.10
+Pillow==10.4.0
+
+# HTMX + Forms
+django-htmx==1.21.0
+django-widget-tweaks==1.5.0
+django-crispy-forms==2.3
+crispy-tailwind==1.0.3
+
+# Background Jobs
+celery==5.4.0
+redis==5.2.0
+django-celery-results==2.5.1
+django-celery-beat==2.7.0
+
+# AI Stack
+litellm==1.52.0
+tenacity==9.0.0
+httpx==0.27.2
+
+# LaTeX / PDF
+jinja2==3.1.4
+
+# Storage
+django-storages==1.14.4
+boto3==1.35.67
+
+# Security & Utils
+whitenoise==6.8.2
+gunicorn==23.0.0
+django-ratelimit==4.1.0
+
+# Testing
+pytest==8.3.4
+pytest-django==4.9.0
+pytest-mock==3.14.0
+factory-boy==3.3.1
+
+# Dev
+django-debug-toolbar==4.4.6
