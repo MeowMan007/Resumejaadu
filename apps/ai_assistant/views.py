@@ -46,17 +46,21 @@ def _error_response(message: str):
 def enhance_summary(request):
     """
     POST /ai/enhance-summary/
-    Body: text, target_role (optional), field_id
-
-    Returns: <textarea> fragment with improved text (HTMX swap)
+    Body: text, summary, target_role (optional), field_id
     """
     allowed, remaining = check_ai_rate_limit(request.user)
     if not allowed:
         return _rate_limit_response()
 
-    raw_text = request.POST.get("text", "").strip()
-    target_role = request.POST.get("target_role", "")
     field_id = request.POST.get("field_id", "id_summary")
+    field_name = request.POST.get("field_name") or (field_id[3:] if field_id.startswith("id_") else field_id)
+    raw_text = (
+        request.POST.get("text")
+        or request.POST.get("summary")
+        or request.POST.get(field_name)
+        or ""
+    ).strip()
+    target_role = request.POST.get("target_role", "")
 
     if not raw_text:
         return _error_response("Please enter some text first.")
@@ -64,7 +68,7 @@ def enhance_summary(request):
     try:
         improved = ai_service.enhance_summary(raw_text, target_role)
         return HttpResponse(
-            _textarea_fragment(field_id, improved, raw_text, remaining),
+            _textarea_fragment(field_id, improved, raw_text, remaining, field_name=field_name),
             content_type="text/html",
         )
     except AIServiceUnavailable as exc:
@@ -83,10 +87,15 @@ def enhance_bullet(request):
     if not allowed:
         return _rate_limit_response()
 
-    raw_text = request.POST.get("text", "").strip()
+    field_id = request.POST.get("field_id", "")
+    field_name = request.POST.get("field_name") or (field_id[3:] if field_id.startswith("id_") else field_id)
+    raw_text = (
+        request.POST.get("text")
+        or request.POST.get(field_name)
+        or ""
+    ).strip()
     role = request.POST.get("role", "")
     company = request.POST.get("company", "")
-    field_id = request.POST.get("field_id", "")
 
     if not raw_text:
         return _error_response("Please enter some text first.")
@@ -94,7 +103,7 @@ def enhance_bullet(request):
     try:
         improved = ai_service.enhance_bullet(raw_text, role, company)
         return HttpResponse(
-            _textarea_fragment(field_id, improved, raw_text, remaining),
+            _textarea_fragment(field_id, improved, raw_text, remaining, field_name=field_name),
             content_type="text/html",
         )
     except AIServiceUnavailable as exc:
@@ -113,10 +122,16 @@ def enhance_project(request):
     if not allowed:
         return _rate_limit_response()
 
-    raw_text = request.POST.get("text", "").strip()
+    field_id = request.POST.get("field_id", "")
+    field_name = request.POST.get("field_name") or (field_id[3:] if field_id.startswith("id_") else field_id)
+    raw_text = (
+        request.POST.get("text")
+        or request.POST.get("description")
+        or request.POST.get(field_name)
+        or ""
+    ).strip()
     tech_stack = request.POST.get("tech_stack", "")
     name = request.POST.get("name", "")
-    field_id = request.POST.get("field_id", "")
 
     if not raw_text:
         return _error_response("Please enter some text first.")
@@ -124,7 +139,7 @@ def enhance_project(request):
     try:
         improved = ai_service.enhance_project_description(raw_text, tech_stack, name)
         return HttpResponse(
-            _textarea_fragment(field_id, improved, raw_text, remaining),
+            _textarea_fragment(field_id, improved, raw_text, remaining, field_name=field_name),
             content_type="text/html",
         )
     except AIServiceUnavailable as exc:
@@ -191,7 +206,13 @@ def tailor_to_job(request):
 
 # ─── HTML Fragments ──────────────────────────────────────────────────────────
 
-def _textarea_fragment(field_id: str, improved: str, original: str, remaining: int) -> str:
+def _textarea_fragment(
+    field_id: str,
+    improved: str,
+    original: str,
+    remaining: int,
+    field_name: str = "",
+) -> str:
     """
     Return an HTML fragment with the improved textarea and an Undo button.
     The original text is stored in a data attribute for client-side undo.
@@ -199,12 +220,13 @@ def _textarea_fragment(field_id: str, improved: str, original: str, remaining: i
     import html
     safe_improved = html.escape(improved)
     safe_original = html.escape(original)
+    actual_name = field_name or (field_id[3:] if field_id.startswith("id_") else field_id)
 
     return f"""
 <div class="ai-result-wrapper" id="{field_id}-wrapper">
   <textarea
     id="{field_id}"
-    name="{field_id.replace('id_', '')}"
+    name="{actual_name}"
     class="form-textarea w-full"
     rows="4"
     data-original="{safe_original}"
@@ -215,9 +237,10 @@ def _textarea_fragment(field_id: str, improved: str, original: str, remaining: i
       class="btn-undo text-xs text-slate-400 hover:text-white transition"
       onclick="
         const ta = document.getElementById('{field_id}');
-        ta.value = ta.dataset.original;
-        this.closest('.ai-actions').querySelector('.ai-undo-notice').style.display='none';
-        this.style.display='none';
+        if (ta) ta.value = ta.dataset.original;
+        const notice = this.closest('.ai-actions')?.querySelector('.ai-undo-notice');
+        if (notice) notice.style.display = 'none';
+        this.style.display = 'none';
       "
     >↩ Undo AI change</button>
     <span class="ai-quota text-xs text-slate-500">{remaining} AI uses left this minute</span>

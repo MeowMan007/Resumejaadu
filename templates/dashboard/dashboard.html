@@ -100,8 +100,7 @@
           </a>
         {% else %}
           <button
-            hx-post="{% url 'resumes:generate_pdf' pk=resume.pk %}"
-            hx-swap="none"
+            type="button"
             onclick="handleGenerate(this, {{ resume.pk }})"
             class="btn-ai text-sm py-2 flex-1 text-center">
             🔄 Generate PDF

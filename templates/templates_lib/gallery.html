@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+{% block title %}LaTeX Resume Templates — ResumeJaadu{% endblock %}
+{% block meta_description %}Explore 20 professional LaTeX resume templates. Optimized for ATS and styled with modern design standards.{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+
+  <!-- Header -->
+  <div class="text-center max-w-3xl mx-auto mb-12">
+    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium text-brand-300 mb-4"
+         style="background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.3);">
+      🎨 20 LaTeX Templates Ready
+    </div>
+    <h1 class="font-display text-4xl sm:text-5xl font-bold text-white mb-4">
+      Template Gallery
+    </h1>
+    <p class="text-slate-400 text-base sm:text-lg">
+      Clean, ATS-compliant, and beautifully designed LaTeX templates compiled directly to pixel-perfect PDFs.
+    </p>
+  </div>
+
+  <!-- Templates by Category -->
+  {% if categories %}
+  <div class="space-y-12">
+    {% for category_name, tmpl_list in categories.items %}
+    <div>
+      <div class="flex items-center gap-3 mb-6 pb-2 border-b border-white/5">
+        <h2 class="font-display text-xl font-bold text-white">{{ category_name }}</h2>
+        <span class="text-xs px-2.5 py-0.5 rounded-full bg-white/5 text-slate-400 border border-white/10">
+          {{ tmpl_list|length }} template{{ tmpl_list|length|pluralize }}
+        </span>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        {% for tmpl in tmpl_list %}
+        <div class="card-hover group flex flex-col justify-between overflow-hidden">
+          
+          <!-- Thumbnail / Preview -->
+          <div class="aspect-[3/4] rounded-xl overflow-hidden mb-4 relative transition-all duration-300 group-hover:scale-[1.02]"
+               style="background: linear-gradient(145deg, #1a1a2e, #16213e);">
+            {% if tmpl.thumbnail %}
+              <img src="{{ tmpl.thumbnail.url }}" alt="{{ tmpl.name }}"
+                   class="w-full h-full object-cover" />
+            {% else %}
+              <!-- Fallback preview mockup -->
+              <div class="w-full h-full flex flex-col justify-center items-center p-6 text-center">
+                <div class="w-12 h-12 rounded-2xl flex items-center justify-center text-xl mb-3"
+                     style="background: rgba(99,102,241,0.2); border: 1px solid rgba(99,102,241,0.3);">
+                  📄
+                </div>
+                <p class="text-xs font-semibold text-slate-300">{{ tmpl.name }}</p>
+                <div class="w-12 h-1 bg-brand-500/40 rounded-full my-2"></div>
+                <div class="space-y-1.5 w-full max-w-[140px]">
+                  <div class="h-1 bg-slate-700/60 rounded"></div>
+                  <div class="h-1 bg-slate-700/40 rounded w-4/5 mx-auto"></div>
+                  <div class="h-1 bg-slate-700/50 rounded w-3/4 mx-auto"></div>
+                </div>
+              </div>
+            {% endif %}
+
+            <!-- Top badges -->
+            <div class="absolute top-3 left-3 flex flex-wrap gap-1">
+              <span class="px-2 py-0.5 text-[10px] font-medium rounded-full bg-dark-900/80 text-brand-300 border border-brand-500/30">
+                {{ tmpl.get_engine_display }}
+              </span>
+            </div>
+
+            <!-- Bottom badges -->
+            <div class="absolute bottom-3 left-3 flex flex-wrap gap-1">
+              {% if tmpl.ats_friendly %}
+              <span class="px-2 py-0.5 text-[10px] font-semibold rounded bg-emerald-950/80 text-emerald-400 border border-emerald-500/30">
+                ✓ ATS-Clean
+              </span>
+              {% endif %}
+              {% if tmpl.supports_photo %}
+              <span class="px-2 py-0.5 text-[10px] font-semibold rounded bg-purple-950/80 text-purple-300 border border-purple-500/30">
+                📷 Photo
+              </span>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- Meta -->
+          <div class="flex-1 flex flex-col justify-between">
+            <div>
+              <h3 class="font-display font-semibold text-white text-base group-hover:text-brand-400 transition-colors">
+                {{ tmpl.name }}
+              </h3>
+              <p class="text-xs text-slate-400 mt-1 line-clamp-2">
+                {{ tmpl.description|default:"Professional LaTeX layout built for high readability." }}
+              </p>
+            </div>
+
+            <!-- Action button -->
+            <div class="mt-4 pt-3 border-t border-white/5 flex items-center justify-between">
+              <span class="text-[11px] text-slate-500 font-mono">License: {{ tmpl.license|default:"MIT" }}</span>
+              {% if user.is_authenticated %}
+                <a href="{% url 'resumes:create_resume' %}" class="text-xs text-brand-400 hover:text-white font-medium transition-colors">
+                  Use Template →
+                </a>
+              {% else %}
+                <a href="{% url 'account_signup' %}" class="text-xs text-brand-400 hover:text-white font-medium transition-colors">
+                  Start Free →
+                </a>
+              {% endif %}
+            </div>
+          </div>
+
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="text-center py-24 glass rounded-2xl max-w-lg mx-auto">
+    <p class="text-5xl mb-4">🎨</p>
+    <h2 class="text-xl font-bold text-white mb-2">No templates loaded yet</h2>
+    <p class="text-slate-400 text-sm mb-6">
+      Run the sync command to discover and register all 20 LaTeX templates into the database:
+    </p>
+    <code class="px-4 py-2 rounded-lg bg-dark-900 border border-white/10 text-brand-300 text-xs font-mono">
+      python manage.py sync_templates
+    </code>
+  </div>
+  {% endif %}
+
+  <!-- Bottom CTA -->
+  <div class="mt-16 text-center py-12 rounded-2xl"
+       style="background: linear-gradient(135deg, rgba(99,102,241,0.1), rgba(139,92,246,0.05)); border: 1px solid rgba(99,102,241,0.2);">
+    <h2 class="font-display text-2xl font-bold text-white mb-2">Ready to craft your resume?</h2>
+    <p class="text-slate-400 text-sm mb-6 max-w-md mx-auto">
+      Create an ATS-friendly, LaTeX-compiled resume in under 10 minutes with AI writing assistance.
+    </p>
+    <a href="{% if user.is_authenticated %}{% url 'resumes:create_resume' %}{% else %}{% url 'account_signup' %}{% endif %}"
+       class="btn-primary text-sm px-8 py-3">
+      ✨ Create My Resume Now
+    </a>
+  </div>
+
+</div>
+{% endblock %}

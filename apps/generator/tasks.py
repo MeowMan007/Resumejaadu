@@ -73,21 +73,22 @@ def generate_resume_pdf(self, generated_pdf_id: int) -> dict:
         with open(pdf_path, "rb") as f:
             gen.file.save(pdf_filename, ContentFile(f.read()), save=False)
 
-        # Clean up temp PDF
-        try:
-            pdf_path.unlink()
-        except OSError:
-            pass
-
-        # 4. Generate thumbnail
+        # 4. Generate thumbnail before cleaning up temp PDF
         with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as tmp_thumb:
             thumb_path = pathlib.Path(tmp_thumb.name)
 
-        thumb_ok = generate_thumbnail(pdf_path if pdf_path.exists() else gen.file.path, thumb_path)
-        if thumb_ok and thumb_path.exists():
-            thumb_filename = f"thumb_{gen.resume_id}_{gen.template.slug}.png"
-            with open(thumb_path, "rb") as tf:
-                gen.thumbnail.save(thumb_filename, ContentFile(tf.read()), save=False)
+        try:
+            thumb_ok = generate_thumbnail(pdf_path, thumb_path)
+            if thumb_ok and thumb_path.exists():
+                thumb_filename = f"thumb_{gen.resume_id}_{gen.template.slug}.png"
+                with open(thumb_path, "rb") as tf:
+                    gen.thumbnail.save(thumb_filename, ContentFile(tf.read()), save=False)
+        finally:
+            # Clean up temp files
+            try:
+                pdf_path.unlink()
+            except OSError:
+                pass
             try:
                 thumb_path.unlink()
             except OSError:

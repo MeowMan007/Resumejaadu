@@ -9,6 +9,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse, JsonResponse, Http404
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.views import View
 from django.views.decorators.http import require_POST
 from django.utils.decorators import method_decorator
@@ -68,7 +69,35 @@ def landing(request):
     """Public landing page."""
     if request.user.is_authenticated:
         return redirect("resumes:dashboard")
-    return render(request, "landing.html")
+
+    features = [
+        "AI bullet rewrites",
+        "20 LaTeX templates",
+        "XeLaTeX + pdfLaTeX",
+        "Zero paid APIs",
+        "One-click PDF export",
+        "ATS-optimized options",
+        "Local AI (Ollama)",
+        "Open-source & self-hostable",
+    ]
+    steps = [
+        {
+            "icon": "📝",
+            "title": "1. Enter Your Details",
+            "desc": "Fill in your experience, education, and skills with our step-by-step wizard.",
+        },
+        {
+            "icon": "✨",
+            "title": "2. AI Polish & Enhance",
+            "desc": "One-click action verb rewrites, XYZ impact formatting, and job alignment.",
+        },
+        {
+            "icon": "📄",
+            "title": "3. LaTeX PDF Export",
+            "desc": "Choose from 20 templates and compile a pixel-perfect, ATS-ready PDF.",
+        },
+    ]
+    return render(request, "landing.html", {"features": features, "steps": steps})
 
 
 @login_required
@@ -372,11 +401,24 @@ def generate_pdf(request, pk: int):
     gen.celery_task_id = task.id
     gen.save(update_fields=["celery_task_id"])
 
+    if request.headers.get("HX-Request"):
+        return render(
+            request,
+            "resumes/partials/pdf_status.html",
+            {
+                "gen": gen,
+                "resume": resume,
+                "status": "pending",
+                "generated_pdf_id": gen.pk,
+            },
+        )
+
+    poll_url = reverse("resumes:pdf_status", kwargs={"pk": pk, "gen_pk": gen.pk})
     return JsonResponse({
         "task_id": task.id,
         "generated_pdf_id": gen.pk,
         "status": "pending",
-        "poll_url": f"/resumes/{pk}/pdf-status/{gen.pk}/",
+        "poll_url": poll_url,
     })
 
 

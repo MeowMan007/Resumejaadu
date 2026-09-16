@@ -5,14 +5,10 @@ Unit tests for apps.generator.latex_utils.latex_escape().
 Verifies that all LaTeX special characters are correctly escaped
 so they render safely in pdflatex documents.
 """
-import django
-import os
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.dev")
-
-from django.test import TestCase
+import unittest
 
 
-class LaTeXEscapeTestCase(TestCase):
+class LaTeXEscapeTestCase(unittest.TestCase):
     """Tests for latex_escape() helper."""
 
     def setUp(self):

@@ -92,6 +92,30 @@ class AIServiceTest(TestCase):
         self.assertIsInstance(result, str)
 
     @patch("apps.ai_assistant.service.litellm.completion")
+    def test_categorize_skills_returns_list(self, mock_completion):
+        mock_completion.return_value = self._make_mock_response(
+            '{"categories": [{"name": "Languages", "items": ["Python", "Rust"]}]}'
+        )
+        from apps.ai_assistant.service import ResumeAIService
+        svc = ResumeAIService()
+        cats = svc.categorize_skills("Python, Rust")
+        self.assertIsInstance(cats, list)
+        self.assertEqual(len(cats), 1)
+        self.assertEqual(cats[0]["name"], "Languages")
+
+    @patch("apps.ai_assistant.service.litellm.completion")
+    def test_tailor_to_job_description_returns_dict(self, mock_completion):
+        mock_completion.return_value = self._make_mock_response(
+            '{"suggested_edits": ["Highlight Django ORM"], "gaps": ["Kubernetes"]}'
+        )
+        from apps.ai_assistant.service import ResumeAIService
+        svc = ResumeAIService()
+        res = svc.tailor_to_job_description(["Built APIs"], "Senior backend role with Kubernetes")
+        self.assertIsInstance(res, dict)
+        self.assertIn("suggested_edits", res)
+        self.assertIn("gaps", res)
+
+    @patch("apps.ai_assistant.service.litellm.completion")
     def test_api_error_raises_or_returns_fallback(self, mock_completion):
         """LiteLLM API errors should be handled gracefully."""
         mock_completion.side_effect = Exception("API error")

@@ -53,7 +53,7 @@
 
     <!-- Feature Pills -->
     <div class="flex flex-wrap justify-center gap-3 text-sm text-slate-400 animate-fade-in" style="animation-delay: 0.6s;">
-      {% for feature in "AI bullet rewrites,20 LaTeX templates,XeLaTeX + pdfLaTeX,Zero paid APIs,One-click PDF export,ATS-optimized options,Local AI (Ollama),Open-source & self-hostable" | split:"," %}
+      {% for feature in features %}
       <span class="px-3 py-1 rounded-full"
             style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);">
         ✓ {{ feature }}

@@ -232,6 +232,23 @@ class ResumeAIService:
             logger.error(f"tailor_to_job_description failed: {exc}")
             raise AIServiceUnavailable("Job tailoring is temporarily unavailable.") from exc
 
+    # Aliases for flexibility & test compatibility
+    def improve_summary(self, current_text: str = "", target_role: str = "", context: dict = None) -> str:
+        return self.enhance_summary(raw_text=current_text, target_role=target_role)
+
+    def improve_project_description(
+        self, current_description: str = "", tech_stack: str = "", name: str = "", target_role: str = ""
+    ) -> str:
+        return self.enhance_project_description(description=current_description, tech_stack=tech_stack, name=name)
+
+    def suggest_skills(self, existing_skills: list = None, target_role: str = "") -> list[str]:
+        raw = ", ".join(existing_skills or [])
+        categories = self.categorize_skills(raw or target_role)
+        results = []
+        for cat in categories:
+            results.extend(cat.get("items", []))
+        return results or (existing_skills or [])
+
 
 # Module-level singleton
 ai_service = ResumeAIService()
