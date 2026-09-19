@@ -1,47 +1,135 @@
 {% extends "base.html" %}
-{% block title %}New Resume — ResumeJaadu{% endblock %}
+{% block title %}Create New Resume — ResumeJaadu{% endblock %}
 
 {% block content %}
-<div class="max-w-lg mx-auto px-4 sm:px-6 lg:px-8 py-16">
-  <div class="mb-8 text-center">
-    <h1 class="font-display text-3xl font-bold text-white mb-2">Start a New Resume</h1>
-    <p class="text-slate-400">Give it a name and tell us your target role so AI can tailor your content.</p>
+<div class="container-md" style="padding: 56px 24px;">
+  <!-- Header -->
+  <div style="text-align:center; max-width: 580px; margin: 0 auto 36px;">
+    <span class="badge badge-yellow mb-3">Community-Proven LaTeX</span>
+    <h1 class="t-display" style="font-size: clamp(26px, 4vw, 36px); margin-bottom: 10px;">
+      Create New Resume
+    </h1>
+    <p class="t-body" style="font-size: 15px;">
+      Pick a highly rated community template and specify your target role to activate AI-tailored suggestions.
+    </p>
   </div>
 
-  <div class="card">
-    <form method="post" id="create-resume-form">
-      {% csrf_token %}
+  <form method="post" id="create-resume-form" style="max-width: 860px; margin: 0 auto;">
+    {% csrf_token %}
 
-      <div class="space-y-5">
+    <!-- Basic Info Card -->
+    <div class="card mb-6" style="padding: 28px;">
+      <h2 class="t-heading" style="font-size: 18px; margin-bottom: 20px;">1. Basic Details</h2>
+
+      <div class="grid grid-2 gap-4">
         <div>
-          <label for="id_title" class="form-label">Resume Title</label>
+          <label for="id_title" class="form-label" style="font-weight:600;">Resume Title</label>
           {{ form.title }}
           {% if form.title.errors %}
-            <p class="mt-1 text-xs text-red-400">{{ form.title.errors|join:", " }}</p>
+            <p class="form-error">{{ form.title.errors|join:", " }}</p>
           {% endif %}
-          <p class="mt-1 text-xs text-slate-500">e.g. "Software Engineer Resume 2024"</p>
+          <p class="t-small mt-1" style="font-size: 11px;">e.g. "Software Engineer 2025" or "Senior Backend"</p>
         </div>
 
         <div>
-          <label for="id_target_role" class="form-label">
-            Target Role
-            <span class="text-slate-500 font-normal">(optional but recommended)</span>
+          <label for="id_target_role" class="form-label" style="font-weight:600;">
+            Target Role <span style="color:var(--gray); font-weight:400;">(optional)</span>
           </label>
           {{ form.target_role }}
           {% if form.target_role.errors %}
-            <p class="mt-1 text-xs text-red-400">{{ form.target_role.errors|join:", " }}</p>
+            <p class="form-error">{{ form.target_role.errors|join:", " }}</p>
           {% endif %}
-          <p class="mt-1 text-xs text-slate-500">AI will use this to focus bullet point improvements.</p>
+          <p class="t-small mt-1" style="font-size: 11px;">AI uses this to polish bullets and action verbs.</p>
         </div>
       </div>
+    </div>
 
-      <div class="mt-8 flex items-center gap-4">
-        <button type="submit" class="btn-primary flex-1 justify-center text-center">
-          Create &amp; Start Building →
-        </button>
-        <a href="{% url 'resumes:dashboard' %}" class="btn-secondary">Cancel</a>
+    <!-- Template Selection Card -->
+    <div class="card mb-6" style="padding: 28px;">
+      <div class="flex justify-between items-center mb-4" style="flex-wrap:wrap; gap:8px;">
+        <div>
+          <h2 class="t-heading" style="font-size: 18px;">2. Select Starting Template</h2>
+          <p class="t-small mt-1">Community favorites proven across r/EngineeringResumes and Overleaf.</p>
+        </div>
+        <span class="badge badge-green" style="font-size:11px;">100% Tested & Verified</span>
       </div>
-    </form>
-  </div>
+
+      <div class="grid grid-3 gap-4" id="template-options">
+        {% for tmpl in community_templates %}
+        <label for="tmpl_{{ tmpl.slug }}" style="cursor:pointer; display:block; margin:0;">
+          <input type="radio" name="template_slug" id="tmpl_{{ tmpl.slug }}" value="{{ tmpl.slug }}"
+                 style="position:absolute; opacity:0; pointer-events:none;"
+                 {% if selected_template == tmpl.slug or forloop.first and not selected_template %}checked{% endif %}>
+
+          <div class="tmpl-pick-card" data-slug="{{ tmpl.slug }}"
+               style="border-radius: 8px; border: 1.5px solid var(--black-4); background: var(--black-3); padding: 16px; height: 100%; display: flex; flex-direction: column; justify-content: space-between; transition: all 0.2s ease;">
+            <div>
+              <div class="flex justify-between items-start mb-2">
+                <span class="badge badge-yellow" style="font-size: 10px; padding: 2px 8px;">
+                  {% if tmpl.slug == "jakes-resume" %}⭐ Top Choice
+                  {% elif tmpl.slug == "faangpath-simple" %}FAANG Standard
+                  {% elif tmpl.slug == "swe-resume" %}Tech Standard
+                  {% elif tmpl.slug == "moderncv-classic" %}Professional
+                  {% else %}Modern 2-Col{% endif %}
+                </span>
+                <span class="check-icon" style="width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid var(--black-4); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: var(--black); background: transparent; transition: all 0.2s;">✓</span>
+              </div>
+
+              <h3 style="font-size: 15px; font-weight: 700; color: var(--white); margin-bottom: 6px;">{{ tmpl.name }}</h3>
+              <p class="t-small" style="font-size: 12px; line-height: 1.45; color: var(--gray-lt); margin-bottom: 12px;">
+                {% if tmpl.slug == "jakes-resume" %}
+                  The #1 developer resume template on Overleaf and Reddit. Ultra-clean single column ATS layout.
+                {% elif tmpl.slug == "faangpath-simple" %}
+                  Created by FAANG engineers to maximize ATS score and recruiter readability.
+                {% elif tmpl.slug == "swe-resume" %}
+                  Streamlined technical layout emphasizing skills, projects, and quantifiable impact.
+                {% elif tmpl.slug == "moderncv-classic" %}
+                  Traditional, authoritative CV format widely recognized across academia and industry.
+                {% else %}
+                  Clean two-column division separating skills/education from deep work experience.
+                {% endif %}
+              </p>
+            </div>
+
+            <div class="flex items-center gap-2 pt-2" style="border-top: 1px solid var(--black-4); font-size: 11px;">
+              {% if tmpl.ats_friendly %}
+              <span style="color: var(--green); font-weight: 600;">✓ ATS Friendly</span>
+              {% endif %}
+              <span style="color: var(--gray); margin-left: auto;">{{ tmpl.get_engine_display }}</span>
+            </div>
+          </div>
+        </label>
+        {% endfor %}
+      </div>
+
+      <p class="t-small mt-4" style="text-align: center; color: var(--gray);">
+        You can switch to any of the 20 templates at any time inside the builder.
+      </p>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex justify-between items-center gap-4">
+      <a href="{% url 'resumes:dashboard' %}" class="btn btn-outline">
+        ← Cancel
+      </a>
+
+      <button type="submit" class="btn btn-primary" style="padding: 12px 32px; font-size: 15px;">
+        Create & Start Building →
+      </button>
+    </div>
+  </form>
 </div>
+
+<style>
+  input[type="radio"]:checked + .tmpl-pick-card {
+    border-color: var(--yellow) !important;
+    background: rgba(232, 185, 49, 0.05) !important;
+    box-shadow: 0 0 0 1px var(--yellow), 0 4px 16px rgba(232, 185, 49, 0.15);
+  }
+  input[type="radio"]:checked + .tmpl-pick-card .check-icon {
+    background: var(--yellow) !important;
+    border-color: var(--yellow) !important;
+    color: var(--black) !important;
+  }
+</style>
 {% endblock %}
