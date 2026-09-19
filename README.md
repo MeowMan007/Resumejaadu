@@ -23,6 +23,15 @@
 
 ---
 
+## 📸 Visual Showcase
+
+| 🏠 Landing Page | 🎨 Template Gallery | 📄 Live Review & PDF |
+|:---:|:---:|:---:|
+| <img src="docs/screenshots/landing_page.png" width="300" alt="Landing Page" /> | <img src="docs/screenshots/template_gallery.png" width="300" alt="Template Gallery" /> | <img src="docs/screenshots/resume_review_pdf.png" width="300" alt="Review & PDF" /> |
+| **Dark Theme Landing Page**<br>No LaTeX setup needed, guided wizard | **20 Overleaf Templates**<br>Community gold standards & ATS clean | **Live Review Hub**<br>Section quick-links & instant PDF export |
+
+---
+
 ## 🏗 Architecture
 
 ```
