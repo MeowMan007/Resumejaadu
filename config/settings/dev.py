@@ -25,4 +25,5 @@ STATICFILES_STORAGE = "django.contrib.staticfiles.storage.StaticFilesStorage"
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 # Celery — run tasks eagerly in dev (no worker needed)
-CELERY_TASK_ALWAYS_EAGER = False  # Set True to skip Celery entirely in dev
+CELERY_TASK_ALWAYS_EAGER = True
+CELERY_TASK_EAGER_PROPAGATES = True
