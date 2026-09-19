@@ -16,7 +16,7 @@ env = environ.Env(
 environ.Env.read_env(BASE_DIR / ".env")
 
 # ─── Core ─────────────────────────────────────────────────────────────────────
-SECRET_KEY = env("SECRET_KEY")
+SECRET_KEY = env("SECRET_KEY", default="django-insecure-prod-fallback-change-in-vercel-env")
 DEBUG = env("DEBUG")
 ALLOWED_HOSTS = env("ALLOWED_HOSTS")
 
@@ -128,6 +128,7 @@ STATIC_URL = "/static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+WHITENOISE_MANIFEST_STRICT = False
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"

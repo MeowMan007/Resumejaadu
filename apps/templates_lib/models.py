@@ -74,9 +74,12 @@ class ResumeTemplate(models.Model):
             return f"{settings.MEDIA_URL}{media_rel}"
         template_thumb = self.template_dir / "thumbnail.png"
         if template_thumb.exists():
-            disk_media.parent.mkdir(parents=True, exist_ok=True)
-            import shutil
-            shutil.copyfile(template_thumb, disk_media)
-            return f"{settings.MEDIA_URL}{media_rel}"
+            try:
+                disk_media.parent.mkdir(parents=True, exist_ok=True)
+                import shutil
+                shutil.copyfile(template_thumb, disk_media)
+                return f"{settings.MEDIA_URL}{media_rel}"
+            except OSError:
+                pass
         return None
 

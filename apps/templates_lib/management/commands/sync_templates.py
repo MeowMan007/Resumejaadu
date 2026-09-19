@@ -88,11 +88,14 @@ class Command(BaseCommand):
             if thumb_path.exists():
                 media_rel = f"template_thumbnails/{slug}.png"
                 media_full = settings.MEDIA_ROOT / media_rel
-                media_full.parent.mkdir(parents=True, exist_ok=True)
-                import shutil
-                shutil.copyfile(thumb_path, media_full)
-                obj.thumbnail = media_rel
-                obj.save(update_fields=["thumbnail"])
+                try:
+                    media_full.parent.mkdir(parents=True, exist_ok=True)
+                    import shutil
+                    shutil.copyfile(thumb_path, media_full)
+                    obj.thumbnail = media_rel
+                    obj.save(update_fields=["thumbnail"])
+                except OSError:
+                    pass
 
             if created:
                 self.stdout.write(self.style.SUCCESS(f"  CREATE {slug}: {obj.name}"))
