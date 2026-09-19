@@ -106,6 +106,17 @@ class EducationForm(forms.ModelForm):
 
 
 class ExperienceForm(forms.ModelForm):
+    bullets_text = forms.CharField(
+        widget=forms.Textarea(attrs={
+            "class": "form-textarea",
+            "rows": 4,
+            "placeholder": "• Led migration of monolithic API to microservices, reducing response time by 40%\n• Designed high-throughput data pipeline processing 2TB daily",
+        }),
+        required=False,
+        label="Achievement Bullets",
+        help_text="Enter bullets (one per line, starting with •, -, or plain text)",
+    )
+
     class Meta:
         model = Experience
         fields = ["company", "role", "location", "start_date", "end_date", "is_current", "order"]
@@ -117,6 +128,46 @@ class ExperienceForm(forms.ModelForm):
             "end_date": forms.DateInput(attrs={"class": "form-input", "type": "month"}),
             "order": forms.HiddenInput(),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance and self.instance.pk:
+            bullets = list(self.instance.bullets.order_by("order").values_list("text", flat=True))
+            if bullets:
+                self.fields["bullets_text"].initial = "\n".join(bullets)
+
+    def save(self, commit=True):
+        instance = super().save(commit=commit)
+        if commit:
+            self._save_bullets(instance)
+        return instance
+
+    def _save_bullets(self, instance):
+        bullets_raw = self.cleaned_data.get("bullets_text", "")
+        lines = [line.strip() for line in bullets_raw.splitlines() if line.strip()]
+        clean_lines = []
+        for l in lines:
+            cleaned = l.lstrip("•-* \t")
+            if cleaned:
+                clean_lines.append(cleaned)
+
+        existing = list(instance.bullets.order_by("order"))
+        for i, text in enumerate(clean_lines):
+            if i < len(existing):
+                bullet = existing[i]
+                if bullet.text != text or bullet.order != i:
+                    bullet.text = text
+                    bullet.order = i
+                    bullet.save(update_fields=["text", "order"])
+            else:
+                ExperienceBullet.objects.create(
+                    experience=instance,
+                    text=text,
+                    order=i
+                )
+        if len(existing) > len(clean_lines):
+            for bullet in existing[len(clean_lines):]:
+                bullet.delete()
 
 
 class ExperienceBulletForm(forms.ModelForm):
