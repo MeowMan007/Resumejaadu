@@ -31,7 +31,7 @@ def compile_tex_to_pdf(
     engine: str,
     asset_dir: pathlib.Path,
     runs: int = 2,
-    timeout: int = 60,
+    timeout: int = 120,
 ) -> pathlib.Path:
     """
     Compile a LaTeX source string into a PDF using the specified engine.
@@ -53,11 +53,12 @@ def compile_tex_to_pdf(
     if engine not in ("pdflatex", "xelatex", "lualatex"):
         raise ValueError(f"Unsupported LaTeX engine: {engine!r}")
 
-    # Validate engine is on PATH
-    if not shutil.which(engine):
+    # Validate engine is on PATH (use refreshed PATH on Windows)
+    safe = _safe_env()
+    if not shutil.which(engine, path=safe.get("PATH")):
         raise LatexCompileError(
             f"LaTeX engine '{engine}' not found on PATH. "
-            "Is TeX Live installed in the worker container?"
+            "Is TeX Live / MiKTeX installed?"
         )
 
     with tempfile.TemporaryDirectory(prefix="resumejaadu_") as workdir:
@@ -121,9 +122,33 @@ def compile_tex_to_pdf(
 def _safe_env() -> dict:
     """Return a minimal environment for the LaTeX subprocess."""
     import os
-    # Pass through PATH and HOME so TeX Live can find fonts/packages
-    safe_keys = {"PATH", "HOME", "TMPDIR", "TEMP", "TMP", "TEXMFHOME", "FONTCONFIG_PATH"}
-    return {k: v for k, v in os.environ.items() if k in safe_keys}
+    import platform
+
+    # Pass through PATH and HOME so TeX Live / MiKTeX can find fonts/packages
+    safe_keys = {"PATH", "HOME", "TMPDIR", "TEMP", "TMP", "TEXMFHOME", "FONTCONFIG_PATH",
+                 "USERPROFILE", "APPDATA", "LOCALAPPDATA", "SYSTEMROOT", "WINDIR"}
+    env = {k: v for k, v in os.environ.items() if k in safe_keys}
+
+    # On Windows, refresh PATH from registry in case MiKTeX was installed after
+    # the Django process started
+    if platform.system() == "Windows":
+        import subprocess as _sp
+        try:
+            machine_path = _sp.run(
+                ["powershell", "-NoProfile", "-Command",
+                 '[Environment]::GetEnvironmentVariable("Path","Machine")'],
+                capture_output=True, text=True, timeout=5
+            ).stdout.strip()
+            user_path = _sp.run(
+                ["powershell", "-NoProfile", "-Command",
+                 '[Environment]::GetEnvironmentVariable("Path","User")'],
+                capture_output=True, text=True, timeout=5
+            ).stdout.strip()
+            env["PATH"] = f"{machine_path};{user_path}"
+        except Exception:
+            pass  # Fall back to inherited PATH
+
+    return env
 
 
 def generate_thumbnail(pdf_path: pathlib.Path, output_path: pathlib.Path, dpi: int = 120) -> bool:
