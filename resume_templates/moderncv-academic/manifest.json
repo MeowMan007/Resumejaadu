@@ -1,0 +1,16 @@
+{
+  "slug": "moderncv-academic",
+  "name": "Curriculum Vitae (Academic)",
+  "source_url": "https://www.overleaf.com/latex/examples/curriculum-vitae-for-researchers/jmrscnymyfps",
+  "license": "Creative Commons CC BY 4.0",
+  "engine": "pdflatex",
+  "category": "academic",
+  "style": "Academic, BibTeX & publications ready",
+  "is_ats_friendly": true,
+  "supports_photo": false,
+  "supports_projects": true,
+  "supports_certifications": true,
+  "is_one_page_design": false,
+  "author": "Researcher CV Template",
+  "notes": "Sourced directly from Overleaf: Curriculum Vitae (Academic)"
+}

@@ -1,0 +1,16 @@
+{
+  "slug": "moderncv-two-column",
+  "name": "Two-Column ModernCV",
+  "source_url": "https://www.overleaf.com/latex/templates/two-column-cv-template-with-moderncv/mqycjnmnswzz",
+  "license": "LaTeX Project Public License",
+  "engine": "xelatex",
+  "category": "two_column",
+  "style": "Two-column ModernCV variant",
+  "is_ats_friendly": false,
+  "supports_photo": true,
+  "supports_projects": true,
+  "supports_certifications": true,
+  "is_one_page_design": false,
+  "author": "ModernCV Community",
+  "notes": "Sourced directly from Overleaf: Two-Column ModernCV"
+}

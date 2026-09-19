@@ -1,51 +1,77 @@
 {% load static %}
 {% if gen.status == "success" %}
-<div class="space-y-3">
-  <div class="flex items-center justify-center gap-2 text-green-400 font-medium">
-    <span class="text-xl">✅</span> PDF Ready!
+<div class="space-y-4 animate-fade-in text-center">
+  <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-950/80 border border-emerald-500/30 text-emerald-400 text-xs font-semibold">
+    <span>✓</span> PDF Successfully Generated!
   </div>
+
   {% if gen.thumbnail %}
-  <img src="{{ gen.thumbnail.url }}" alt="PDF preview"
-       class="w-full max-w-[180px] mx-auto rounded-lg shadow-lg border border-white/10" />
+  <div class="relative group max-w-[200px] mx-auto rounded-xl overflow-hidden shadow-2xl border border-white/10">
+    <img src="{{ gen.thumbnail.url }}" alt="PDF preview" class="w-full h-auto object-cover" />
+    <a href="{{ gen.file.url }}" target="_blank"
+       class="absolute inset-0 bg-dark-950/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity text-white text-xs font-semibold">
+      👁 View Full Size
+    </a>
+  </div>
   {% endif %}
-  <div class="flex gap-2 justify-center flex-wrap">
+
+  <div class="flex gap-2.5 justify-center flex-wrap">
     <a href="{% url 'resumes:download_pdf' pk=resume.pk gen_pk=gen.pk %}"
-       class="btn-primary text-sm">
+       class="btn-primary text-xs px-5 py-2.5 shadow-lg shadow-brand-500/30">
       ⬇ Download PDF
     </a>
-    <a href="{{ gen.file.url }}" target="_blank" class="btn-secondary text-sm">
-      👁 Preview
+    <a href="{{ gen.file.url }}" target="_blank" class="btn-secondary text-xs px-4 py-2.5">
+      👁 Preview in Browser
     </a>
   </div>
-  <p class="text-[10px] text-slate-600">Generated {{ gen.created_at|timesince }} ago</p>
+  <p class="text-[11px] text-slate-500">Generated {{ gen.created_at|timesince }} ago</p>
 </div>
 
 {% elif gen.status == "compiling" or gen.status == "pending" %}
-<div class="space-y-2"
+<div class="space-y-3 py-4 animate-fade-in text-center"
      hx-get="{% url 'resumes:pdf_status' pk=resume.pk gen_pk=gen.pk %}"
      hx-trigger="every 2s"
      hx-target="#pdf-status-panel"
      hx-swap="innerHTML">
-  <div class="flex items-center justify-center gap-2 text-brand-400">
-    <svg class="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+  <div class="flex items-center justify-center gap-2.5 text-brand-300 font-medium">
+    <svg class="animate-spin h-5 w-5 text-brand-400" fill="none" viewBox="0 0 24 24">
       <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
       <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
     </svg>
-    <span class="text-sm">{{ gen.get_status_display }}…</span>
+    <span class="text-sm font-semibold">{{ gen.get_status_display }}…</span>
   </div>
-  <p class="text-xs text-slate-500">This usually takes 10–30 seconds.</p>
+  <p class="text-xs text-slate-400 max-w-xs mx-auto">
+    Compiling via {{ resume.template.get_engine_display|default:"LaTeX" }}. Usually takes 5–15 seconds.
+  </p>
 </div>
 
 {% elif gen.status == "failed" %}
-<div class="space-y-2 text-red-400">
-  <p class="text-sm font-medium">❌ Compilation failed.</p>
-  <p class="text-xs text-red-500">Check that all required fields are filled. LaTeX errors are logged server-side.</p>
+<div class="space-y-3 animate-fade-in text-left">
+  <div class="p-3 rounded-xl bg-red-950/60 border border-red-500/30 text-red-300 text-xs">
+    <div class="flex items-center gap-2 font-semibold mb-1">
+      <span>✕</span>
+      <span>Compilation Failed</span>
+    </div>
+    <p class="text-slate-400 text-[11px]">
+      The LaTeX engine encountered an issue while compiling this template.
+    </p>
+  </div>
+
+  {% if gen.error_message %}
+  <details class="text-xs text-slate-400">
+    <summary class="cursor-pointer hover:text-white py-1 select-none font-mono text-[11px]">
+      ▶ View compiler output
+    </summary>
+    <pre class="p-3 rounded-lg bg-dark-950 border border-white/10 text-slate-400 font-mono text-[10px] overflow-x-auto max-h-40 leading-tight mt-1">{{ gen.error_message|truncatechars:1200 }}</pre>
+  </details>
+  {% endif %}
+
   <button id="generate-btn"
           hx-post="{% url 'resumes:generate_pdf' pk=resume.pk %}"
           hx-target="#pdf-status-panel"
           hx-swap="innerHTML"
-          class="btn-secondary text-sm w-full">
-    🔄 Retry
+          class="btn-secondary text-xs w-full py-2.5 justify-center">
+    🔄 Try Compiling Again
   </button>
 </div>
 {% endif %}

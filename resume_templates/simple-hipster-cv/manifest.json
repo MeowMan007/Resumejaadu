@@ -1,0 +1,16 @@
+{
+  "slug": "simple-hipster-cv",
+  "name": "Simple Hipster CV",
+  "source_url": "https://www.overleaf.com/latex/templates/simple-hipster-cv/cnpkkjdkyhhw",
+  "license": "LaTeX Project Public License",
+  "engine": "pdflatex",
+  "category": "creative",
+  "style": "Colorful sidebar with icons",
+  "is_ats_friendly": false,
+  "supports_photo": true,
+  "supports_projects": true,
+  "supports_certifications": true,
+  "is_one_page_design": true,
+  "author": "Jan Vorisek",
+  "notes": "Sourced directly from Overleaf: Simple Hipster CV"
+}

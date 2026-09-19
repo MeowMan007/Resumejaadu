@@ -1,0 +1,16 @@
+{
+  "slug": "altacv-editorial",
+  "name": "AltaCV Editorial",
+  "source_url": "https://www.overleaf.com/latex/templates/recreating-business-insiders-cv-of-marissa-mayer/gtqfpbwncfvp",
+  "license": "LaTeX Project Public License 1.3",
+  "engine": "xelatex",
+  "category": "two_column",
+  "style": "Editorial-style AltaCV (Business Insider layout)",
+  "is_ats_friendly": false,
+  "supports_photo": true,
+  "supports_projects": true,
+  "supports_certifications": true,
+  "is_one_page_design": true,
+  "author": "Lian Tze Lim",
+  "notes": "Sourced directly from Overleaf: AltaCV Editorial"
+}

@@ -1,34 +1,117 @@
-﻿%% Awesome CV — Stub template for ResumeJaadu
-%% Replace this file with the actual .tex.jinja source.
-%% Variables use \VAR{...} / \BLOCK{...} delimiters (LaTeX-safe Jinja2).
-\documentclass[11pt,letterpaper]{article}
-\pagestyle{empty}
+%!TEX TS-program = xelatex
+%!TEX encoding = UTF-8 Unicode
+\documentclass[11pt, a4paper]{awesome-cv}
+
+\geometry{left=1.4cm, top=1.4cm, right=1.4cm, bottom=1.8cm, footskip=.5cm}
+\fontdir[fonts/]
+\colorlet{awesome}{awesome-emerald}
+\setbool{acvSectionColorHighlight}{true}
+
+\name{\VAR{full_name}}{}
+\position{\BLOCK{ if experience }\VAR{experience[0].role}\BLOCK{ else }Professional\BLOCK{ endif }}
+\address{\VAR{location|default('')}}
+
+\mobile{\VAR{phone|default('')}}
+\email{\VAR{email}}
+\homepage{\VAR{website|default('')}}
+\github{\VAR{github|default('')}}
+\linkedin{\VAR{linkedin|default('')}}
+
 \begin{document}
 
-\textbf{\VAR{full_name}}\\
-\VAR{email} \quad \VAR{phone|default('')}\\
-\VAR{location|default('')}
+\makecvheader[C]
+\makecvfooter{\today}{\VAR{full_name}~~~·~~~Résumé}{\thepage}
 
-\bigskip
-\textit{\VAR{summary|default('')}}
+\BLOCK{ if summary }
+\cvsection{Summary}
+\begin{cvparagraph}
+\VAR{summary}
+\end{cvparagraph}
+\BLOCK{ endif }
 
 \BLOCK{ if experience }
-\section*{Experience}
+\cvsection{Work Experience}
+\begin{cventries}
 \BLOCK{ for exp in experience }
-\textbf{\VAR{exp.role}} at \VAR{exp.company} (\VAR{exp.start_date} -- \VAR{exp.end_date|default('Present')})
-\begin{itemize}
-\BLOCK{ for b in exp.bullets }
-  \item \VAR{b}
+  \cventry
+    {\VAR{exp.role}}
+    {\VAR{exp.company}}
+    {\VAR{exp.location|default('')}}
+    {\VAR{exp.start_date} -- \VAR{exp.end_date|default('Present')}}
+    {
+      \begin{cvitems}
+        \BLOCK{ for b in exp.bullets }
+        \item {\VAR{b}}
+        \BLOCK{ endfor }
+      \end{cvitems}
+    }
 \BLOCK{ endfor }
-\end{itemize}
+\end{cventries}
+\BLOCK{ endif }
+
+\BLOCK{ if projects }
+\cvsection{Key Projects}
+\begin{cventries}
+\BLOCK{ for proj in projects }
+  \cventry
+    {\VAR{proj.technologies|default('Personal Project')}}
+    {\VAR{proj.title}}
+    {\BLOCK{ if proj.link }\href{\VAR{proj.link}}{Demo}\BLOCK{ endif }}
+    {}
+    {
+      \begin{cvitems}
+        \BLOCK{ if proj.description }\item {\VAR{proj.description}}\BLOCK{ endif }
+        \BLOCK{ for b in proj.bullets }
+        \item {\VAR{b}}
+        \BLOCK{ endfor }
+      \end{cvitems}
+    }
 \BLOCK{ endfor }
+\end{cventries}
+\BLOCK{ endif }
+
+\BLOCK{ if skills or skill_categories }
+\cvsection{Skills}
+\begin{cvskills}
+\BLOCK{ for cat in skill_categories }
+  \cvskill
+    {\VAR{cat.category_name}}
+    {\VAR{cat.skills|join(', ')}}
+\BLOCK{ endfor }
+\BLOCK{ if not skill_categories and skills }
+  \cvskill
+    {Skills}
+    {\VAR{skills|join(', ')}}
+\BLOCK{ endif }
+\end{cvskills}
 \BLOCK{ endif }
 
 \BLOCK{ if education }
-\section*{Education}
+\cvsection{Education}
+\begin{cventries}
 \BLOCK{ for edu in education }
-\textbf{\VAR{edu.degree}}, \VAR{edu.institution} (\VAR{edu.start_date} -- \VAR{edu.end_date|default('')})
+  \cventry
+    {\VAR{edu.degree}\BLOCK{ if edu.gpa } (GPA: \VAR{edu.gpa})\BLOCK{ endif }}
+    {\VAR{edu.institution}}
+    {\VAR{edu.location|default('')}}
+    {\VAR{edu.start_date} -- \VAR{edu.end_date|default('Present')}}
+    {}
 \BLOCK{ endfor }
+\end{cventries}
+\BLOCK{ endif }
+
+\BLOCK{ if certifications }
+\cvsection{Certifications}
+\begin{cventries}
+\BLOCK{ for cert in certifications }
+  \cventry
+    {\VAR{cert.issuer|default('')}}
+    {\VAR{cert.name}}
+    {}
+    {\VAR{cert.date_obtained|default('')}}
+    {}
+\BLOCK{ endfor }
+\end{cventries}
 \BLOCK{ endif }
 
 \end{document}

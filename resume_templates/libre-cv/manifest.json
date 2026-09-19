@@ -1,0 +1,16 @@
+{
+  "slug": "libre-cv",
+  "name": "Libre CV",
+  "source_url": "https://www.overleaf.com/latex/templates/libre-cv/bmdtjqdhwtsz",
+  "license": "MIT",
+  "engine": "pdflatex",
+  "category": "two_column",
+  "style": "Minimalist two-column",
+  "is_ats_friendly": true,
+  "supports_photo": false,
+  "supports_projects": true,
+  "supports_certifications": true,
+  "is_one_page_design": true,
+  "author": "Libre CV Team",
+  "notes": "Sourced directly from Overleaf: Libre CV"
+}

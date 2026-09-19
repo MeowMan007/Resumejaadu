@@ -1,0 +1,16 @@
+{
+  "slug": "deedy-single-column",
+  "name": "Single-Column Deedy",
+  "source_url": "https://www.overleaf.com/latex/templates/single-column-deedy-cv-slash-resume-template/zwyxmkbrfgtz",
+  "license": "Apache 2.0",
+  "engine": "xelatex",
+  "category": "single_column",
+  "style": "One-column Deedy variant",
+  "is_ats_friendly": true,
+  "supports_photo": false,
+  "supports_projects": true,
+  "supports_certifications": true,
+  "is_one_page_design": true,
+  "author": "Debarghya Das & Spandan Tiwari",
+  "notes": "Sourced directly from Overleaf: Single-Column Deedy"
+}

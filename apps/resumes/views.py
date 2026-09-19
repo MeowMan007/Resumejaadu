@@ -97,7 +97,16 @@ def landing(request):
             "desc": "Choose from 20 templates and compile a pixel-perfect, ATS-ready PDF.",
         },
     ]
-    return render(request, "landing.html", {"features": features, "steps": steps})
+    featured_templates = ResumeTemplate.objects.filter(is_active=True)[:8]
+    return render(
+        request,
+        "landing.html",
+        {
+            "features": features,
+            "steps": steps,
+            "featured_templates": featured_templates,
+        },
+    )
 
 
 @login_required
@@ -109,7 +118,21 @@ def dashboard(request):
         .prefetch_related("generated_pdfs")
         .order_by("-updated_at")
     )
-    return render(request, "dashboard/dashboard.html", {"resumes": resumes})
+    total_resumes = resumes.count()
+    total_pdfs = GeneratedPDF.objects.filter(resume__user=request.user, status="completed").count()
+    starter_templates = ResumeTemplate.objects.filter(is_active=True)[:4]
+
+    return render(
+        request,
+        "dashboard/dashboard.html",
+        {
+            "resumes": resumes,
+            "total_resumes": total_resumes,
+            "total_pdfs": total_pdfs,
+            "starter_templates": starter_templates,
+        },
+    )
+
 
 
 # ─── Create Resume ────────────────────────────────────────────────────────────

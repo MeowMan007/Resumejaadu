@@ -1,0 +1,170 @@
+%!TEX TS-program = xelatex
+
+\documentclass[]{friggeri-cv}
+\addbibresource{references/publications.bib}
+\addbibresource{references/workshops.bib}
+
+\begin{document}
+\header{Yeshasvi}{ Tirupachuri}
+      {%coexisting with robots
+      }
+
+% In the aside, each new line forces a line break
+\begin{aside}
+  \section{ \ }
+    \hspace*{-1cm} \includegraphics[width=4cm]{tirupachuri.jpg}
+  \section{about}
+    \hspace*{-1cm} Italian Institute of Technology
+    30 Via Morego 
+    16163, Genova, Italy
+    \hspace*{-1cm} \href{mailto:yeshasvi.tirupachuri@iit.it}{\mail \ yeshasvi.tirupachuri@iit.it}
+    \href{https://twitter.com/yeshasvitvs}{\twitter} \href{https://www.linkedin.com/in/yeshasvitvs}{\linkedin} \href{https://github.com/yeshasvitvs}{\github \ yeshasvitvs}
+    ~
+  \section{languages}
+    English, French, Italian
+    Hindi, Telugu, Tamil
+    ~
+  \section{software}
+    C++, Matlab, Python
+    OpenCV, Gazebo
+    ROS, YARP
+    Latex, Github, Linux
+    ~
+  \section{references}
+    \href{mailto:daniele.pucci@iit.it}{daniele.pucci@iit.it}
+    \href{mailto:silvio.traversaro@iit.it}{silvio.traversaro@iit.it}
+    \href{mailto:chiara.bartolozzi@iit.it}{chiara.bartolozzi@iit.it}
+    \hspace{-2cm}\href{mailto:fulvio.mastrogiovanni@unige.it}{fulvio.mastrogiovanni@unige.it}
+    ~
+  \section{hobbies}
+    Hiking
+    Photography
+\end{aside}
+
+\section{interests}
+
+Human-Robot Collaboration, Humanoids, Nonlinear Control and Reinforcement Learning
+
+\section{education}
+
+\begin{entrylist}
+  \entry
+    {since 2015}
+    {Ph.D. {\normalfont fellow Cognitive Robotics}}
+    {iCub Facility/IIT, DIBRIS/Unige}
+    {\emph{Enhanced Human-Robot Collaboration}}
+  \entry
+    {2014–2015}
+    {M.Sc. in Advanced Robotics}
+    {University of Genova, Italy}
+    {}
+  \entry
+    {2013–2014}
+    {M.Sc. in Robotics Engineering}
+    {Ecole Centrale de Nantes, France}
+    {}
+  \entry
+    {2007–2011}
+    {B.Tech. in Electrical and Electronics Engineering}
+    {Pondicherry University}
+    {}
+\end{entrylist}
+
+\vspace{-0.35cm}
+
+\section{experience}
+
+\begin{entrylist}
+  \entry
+    {2017-2019}
+    {Dynamic Interaction Control, IIT, Italy}
+    {Research Collaborator}
+    {\emph{\small Advancing Anticipatory Behaviors in \\ Dynamic Human-Robot Collaboration (AnDy)\footnotemark}}
+  \entry
+    {03–09 2015}
+    {iCub Facility, IIT, Italy}
+    {Research Internship}
+    {\emph{Vergence control with a neuromorphic iCub ~\cite{7803355}}}
+  \entry
+    {01–02 2015}
+    {Emaro Lab, Unige, Italy}
+    {Research Internship}
+    {\emph{Human-Robot Cooperation using Wearable Sensing ~\cite{tirupachurihuman}}}
+  \entry
+    {07–08 2014}
+    {Emaro Lab, Unige, Italy}
+    {Teaching Assistant}
+    {\emph{Software Architecture using ROS}}
+  \entry
+    {2011-2013}
+    {Madras Rubber Factory Limited, India}
+    {Automation Engineer}
+    {Commissioning and Maintenance of Heavy Machinery}
+\end{entrylist}
+
+\footnotetext{https://andy-project.eu/}
+
+\vspace{-0.35cm}
+
+\section{training}
+
+\begin{entrylist}
+  \entry
+    {2018}
+    {CSAIL@MIT}
+    {Graduate Summer School}
+    {\emph{Cognitive Robotics - Planning under uncertainity}}
+  \entry
+    {2016}
+    {International Society of Motor Control}
+    {Graduate Summer School}
+    {\emph{Human Motor Control}}
+\end{entrylist}
+
+\vspace{-0.35cm}
+
+\section{scholarships \& awards}
+
+\begin{entrylist}
+  \entry
+    {2015}
+    {European Union}
+    {Early Stage Researcher}
+    {\emph{PACE\footnotemark ITN Marie skłodowska-curie actions fellowship}}
+    
+ \entry
+    {2019}
+    {\href{https://saiconference.com/IntelliSys}{Intelligent Systems Conference}}
+    {\href{https://saiconference.com/Conferences}{Science and Information Conferences}}
+    {\emph{Best Student Paper Award \cite{tirupachuri2019towards}}}
+\end{entrylist}
+
+\footnotetext{https://cordis.europa.eu/project/id/642961/it}
+
+%------------------- Publications Section -------------------% 
+
+\vspace{-0.35cm}
+
+\newgeometry{left=2cm} 
+\newpage
+
+\section{publications}
+
+\begin{refsection}[references/publications]
+   \nocite{*}   
+   \printbibliography[heading=none]
+\end{refsection}
+
+%------------------- Workshop Section -------------------% 
+
+\section{workshops}
+
+\DeclareFieldFormat{labelnumberwidth}{\textbf{\textbullet}}
+%\setlength{\biblabelsep}{0pt}
+
+\begin{refsection}[references/workshops]
+   \nocite{*}   
+   \printbibliography[heading=none]
+\end{refsection}
+
+\end{document}

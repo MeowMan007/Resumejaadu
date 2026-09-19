@@ -1,0 +1,16 @@
+{
+  "slug": "faangpath-simple",
+  "name": "FAANGPath Simple",
+  "source_url": "https://www.overleaf.com/latex/templates/faangpath-simple-template/npsfpdqnxmbc",
+  "license": "Creative Commons CC BY 4.0",
+  "engine": "pdflatex",
+  "category": "single_column",
+  "style": "Plain, ATS-first",
+  "is_ats_friendly": true,
+  "supports_photo": false,
+  "supports_projects": true,
+  "supports_certifications": true,
+  "is_one_page_design": true,
+  "author": "FAANGPath Team",
+  "notes": "Sourced directly from Overleaf: FAANGPath Simple"
+}

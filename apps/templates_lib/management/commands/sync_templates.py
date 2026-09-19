@@ -64,6 +64,8 @@ class Command(BaseCommand):
                 skipped_count += 1
                 continue
 
+            ats_friendly = data.get("ats_friendly", data.get("is_ats_friendly", False))
+
             obj, created = ResumeTemplate.objects.update_or_create(
                 slug=slug,
                 defaults={
@@ -76,10 +78,21 @@ class Command(BaseCommand):
                     "supports_projects": data.get("supports_projects", True),
                     "supports_certifications": data.get("supports_certifications", True),
                     "is_one_page_design": data.get("is_one_page_design", True),
-                    "ats_friendly": data.get("ats_friendly", False),
+                    "ats_friendly": ats_friendly,
                     "is_active": data.get("is_active", True),
                 },
             )
+
+            # Ensure thumbnail is copied to media if it exists
+            thumb_path = template_dir / "thumbnail.png"
+            if thumb_path.exists():
+                media_rel = f"template_thumbnails/{slug}.png"
+                media_full = settings.MEDIA_ROOT / media_rel
+                media_full.parent.mkdir(parents=True, exist_ok=True)
+                import shutil
+                shutil.copyfile(thumb_path, media_full)
+                obj.thumbnail = media_rel
+                obj.save(update_fields=["thumbnail"])
 
             if created:
                 self.stdout.write(self.style.SUCCESS(f"  CREATE {slug}: {obj.name}"))
@@ -88,8 +101,15 @@ class Command(BaseCommand):
                 self.stdout.write(f"  UPDATE {slug}: {obj.name}")
                 updated_count += 1
 
+        # Delete stale templates from DB that no longer exist in directory
+        active_slugs = {d.name for d in root.iterdir() if d.is_dir()}
+        deleted_count, _ = ResumeTemplate.objects.exclude(slug__in=active_slugs).delete()
+        if deleted_count:
+            self.stdout.write(self.style.WARNING(f"  DELETED {deleted_count} stale template records from DB."))
+
         self.stdout.write(
             self.style.SUCCESS(
-                f"\nDone. {created_count} created, {updated_count} updated, {skipped_count} skipped."
+                f"\nDone. {created_count} created, {updated_count} updated, {skipped_count} skipped, {deleted_count} deleted."
             )
         )
+

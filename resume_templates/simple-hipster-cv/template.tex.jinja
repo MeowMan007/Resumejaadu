@@ -1,0 +1,104 @@
+%-------------------------
+% Libre CV — Minimalist Two-Column
+%------------------------
+\documentclass[10pt, a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[empty]{fullpage}
+\usepackage{titlesec}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage{paracol}
+\usepackage{xcolor}
+\usepackage[left=0.6in,top=0.6in,right=0.6in,bottom=0.6in]{geometry}
+
+\definecolor{primary}{HTML}{2B2D42}
+\definecolor{accent}{HTML}{4D7298}
+\definecolor{text}{HTML}{2B2D42}
+
+\titleformat{\section}{\color{primary}\large\bfseries\scshape}{}{0em}{}[\color{accent}\titlerule \vspace{-3pt}]
+
+\begin{document}
+
+% Header
+\begin{center}
+    {\Huge \textbf{\color{primary}\VAR{full_name}}} \\ \vspace{4pt}
+    \small \color{text}
+    \BLOCK{ if email }\href{mailto:\VAR{email}}{\VAR{email}} \quad$\vert$\quad\BLOCK{ endif }
+    \BLOCK{ if phone }\VAR{phone} \quad$\vert$\quad\BLOCK{ endif }
+    \BLOCK{ if location }\VAR{location} \quad$\vert$\quad\BLOCK{ endif }
+    \BLOCK{ if linkedin }\href{\VAR{linkedin}}{LinkedIn}\BLOCK{ endif }
+\end{center}
+\vspace{6pt}
+
+\BLOCK{ if summary }
+\section{About Me}
+\small{\VAR{summary}}
+\vspace{6pt}
+\BLOCK{ endif }
+
+\columnratio{0.68}
+\begin{paracol}{2}
+
+\BLOCK{ if experience }
+\section{Experience}
+\BLOCK{ for exp in experience }
+\noindent
+\textbf{\VAR{exp.role}} \hfill \textbf{\small\VAR{exp.start_date} -- \VAR{exp.end_date|default('Present')}}\\
+\textit{\color{accent}\VAR{exp.company}} \hfill \textit{\small\VAR{exp.location|default('')}}
+\begin{itemize}[leftmargin=12pt, topsep=2pt, itemsep=1pt]
+    \BLOCK{ for b in exp.bullets }
+    \item \small{\VAR{b}}
+    \BLOCK{ endfor }
+\end{itemize}
+\vspace{4pt}
+\BLOCK{ endfor }
+\BLOCK{ endif }
+
+\BLOCK{ if projects }
+\section{Key Projects}
+\BLOCK{ for proj in projects }
+\noindent
+\textbf{\VAR{proj.title}} \BLOCK{ if proj.technologies }\textit{(\VAR{proj.technologies})}\BLOCK{ endif }
+\begin{itemize}[leftmargin=12pt, topsep=2pt, itemsep=1pt]
+    \BLOCK{ if proj.description }\item \small{\VAR{proj.description}}\BLOCK{ endif }
+    \BLOCK{ for b in proj.bullets }\item \small{\VAR{b}}\BLOCK{ endfor }
+\end{itemize}
+\vspace{4pt}
+\BLOCK{ endfor }
+\BLOCK{ endif }
+
+\switchcolumn
+
+\BLOCK{ if education }
+\section{Education}
+\BLOCK{ for edu in education }
+\textbf{\VAR{edu.degree}}\\
+\textit{\color{accent}\VAR{edu.institution}}\\
+\small\VAR{edu.start_date} -- \VAR{edu.end_date|default('Present')}\\
+\BLOCK{ if edu.gpa }\small GPA: \VAR{edu.gpa}\\\BLOCK{ endif }
+\vspace{4pt}
+\BLOCK{ endfor }
+\BLOCK{ endif }
+
+\BLOCK{ if skills or skill_categories }
+\section{Skills}
+\BLOCK{ for cat in skill_categories }
+\textbf{\small\VAR{cat.category_name}}\\
+\small\VAR{cat.skills|join(', ')}\\[4pt]
+\BLOCK{ endfor }
+\BLOCK{ if not skill_categories and skills }
+\small\VAR{skills|join(', ')}\\[4pt]
+\BLOCK{ endif }
+\BLOCK{ endif }
+
+\BLOCK{ if certifications }
+\section{Certifications}
+\BLOCK{ for cert in certifications }
+\textbf{\small\VAR{cert.name}}\\
+\small\VAR{cert.issuer|default('')} (\VAR{cert.date_obtained|default('')})\\[3pt]
+\BLOCK{ endfor }
+\BLOCK{ endif }
+
+\end{paracol}
+
+\end{document}

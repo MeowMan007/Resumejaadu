@@ -1,0 +1,16 @@
+{
+  "slug": "deedy-cv",
+  "name": "Deedy CV",
+  "source_url": "https://www.overleaf.com/latex/templates/deedy-cv/bjryvfsjdyxz",
+  "license": "Apache 2.0",
+  "engine": "xelatex",
+  "category": "two_column",
+  "style": "Dense two-column",
+  "is_ats_friendly": false,
+  "supports_photo": false,
+  "supports_projects": true,
+  "supports_certifications": true,
+  "is_one_page_design": true,
+  "author": "Debarghya Das",
+  "notes": "Sourced directly from Overleaf: Deedy CV"
+}

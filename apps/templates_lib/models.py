@@ -59,3 +59,24 @@ class ResumeTemplate(models.Model):
     @property
     def jinja_template_path(self):
         return self.template_dir / "template.tex.jinja"
+
+    @property
+    def thumbnail_url(self):
+        if self.thumbnail:
+            try:
+                return self.thumbnail.url
+            except Exception:
+                pass
+        from django.conf import settings
+        media_rel = f"template_thumbnails/{self.slug}.png"
+        disk_media = settings.MEDIA_ROOT / media_rel
+        if disk_media.exists():
+            return f"{settings.MEDIA_URL}{media_rel}"
+        template_thumb = self.template_dir / "thumbnail.png"
+        if template_thumb.exists():
+            disk_media.parent.mkdir(parents=True, exist_ok=True)
+            import shutil
+            shutil.copyfile(template_thumb, disk_media)
+            return f"{settings.MEDIA_URL}{media_rel}"
+        return None
+

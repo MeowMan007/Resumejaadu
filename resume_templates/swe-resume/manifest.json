@@ -1,0 +1,16 @@
+{
+  "slug": "swe-resume",
+  "name": "SWE Resume Template",
+  "source_url": "https://www.overleaf.com/latex/templates/swe-resume-template/bznbzdprjfyy",
+  "license": "MIT",
+  "engine": "pdflatex",
+  "category": "single_column",
+  "style": "Clean ATS-optimized for Software Engineers",
+  "is_ats_friendly": true,
+  "supports_photo": false,
+  "supports_projects": true,
+  "supports_certifications": true,
+  "is_one_page_design": true,
+  "author": "SWE Template Authors",
+  "notes": "Sourced directly from Overleaf: SWE Resume Template"
+}

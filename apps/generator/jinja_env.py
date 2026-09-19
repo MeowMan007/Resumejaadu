@@ -71,24 +71,117 @@ def render_resume_to_tex(resume, template_obj) -> str:
 
 
 def _build_context(resume) -> dict:
-    """Build the full Jinja2 context from a Resume instance."""
+    """Build the full Jinja2 context from a Resume instance with rich variable aliases."""
+    from .latex_utils import latex_escape
+
     # Safely get personal info
     try:
         pi = resume.personal_info
     except Exception:
         pi = None
 
+    # Format experience items with normalized bullets and date strings
+    exp_list = []
+    for exp in resume.experience.prefetch_related("bullets").order_by("order", "-start_date"):
+        bullet_texts = [b.text for b in exp.bullets.all()]
+        start_str = exp.start_date.strftime("%b %Y") if exp.start_date else ""
+        end_str = "Present" if exp.is_current else (exp.end_date.strftime("%b %Y") if exp.end_date else "Present")
+        exp_list.append({
+            "role": exp.role,
+            "company": exp.company,
+            "location": exp.location,
+            "start_date": start_str,
+            "end_date": end_str,
+            "is_current": exp.is_current,
+            "bullets": bullet_texts,
+            "raw": exp,
+        })
+
+    # Format education items
+    edu_list = []
+    for edu in resume.education.order_by("order", "-start_date"):
+        start_str = edu.start_date.strftime("%b %Y") if edu.start_date else ""
+        end_str = "Present" if edu.is_current else (edu.end_date.strftime("%b %Y") if edu.end_date else "")
+        edu_list.append({
+            "institution": edu.institution,
+            "degree": edu.degree,
+            "field_of_study": edu.field_of_study,
+            "location": edu.location,
+            "start_date": start_str,
+            "end_date": end_str,
+            "gpa": edu.gpa,
+            "raw": edu,
+        })
+
+    # Format projects
+    proj_list = []
+    for proj in resume.projects.order_by("order"):
+        proj_list.append({
+            "title": proj.name,
+            "name": proj.name,
+            "technologies": proj.tech_stack,
+            "tech_stack": proj.tech_stack,
+            "link": proj.link,
+            "description": proj.description,
+            "bullets": [proj.description] if proj.description else [],
+            "raw": proj,
+        })
+
+    # Format skill categories
+    skill_cat_list = []
+    all_flat_skills = []
+    for cat in resume.skill_categories.order_by("order"):
+        items = cat.items if isinstance(cat.items, list) else []
+        all_flat_skills.extend(items)
+        skill_cat_list.append({
+            "name": cat.name,
+            "category_name": cat.name,
+            "items": items,
+            "skills": items,
+            "raw": cat,
+        })
+
+    # Format certifications
+    cert_list = []
+    for cert in resume.certifications.order_by("-date"):
+        date_str = cert.date.strftime("%b %Y") if cert.date else ""
+        cert_list.append({
+            "name": cert.name,
+            "issuer": cert.issuer,
+            "date": date_str,
+            "date_obtained": date_str,
+            "credential_url": cert.credential_url,
+            "raw": cert,
+        })
+
+    full_name = pi.full_name if pi else "Firstname Lastname"
+    email = pi.email if pi else ""
+    phone = pi.phone if pi else ""
+    location = pi.location if pi else ""
+    linkedin = pi.linkedin_url if pi else ""
+    github = pi.github_url if pi else ""
+    website = pi.portfolio_url if pi else ""
+    summary = pi.summary if pi else ""
+
     return {
         "resume": resume,
         "personal": pi,
-        "education": list(resume.education.order_by("order", "-start_date")),
-        "experience": list(
-            resume.experience.prefetch_related("bullets").order_by("order", "-start_date")
-        ),
-        "projects": list(resume.projects.order_by("order")),
-        "skill_categories": list(resume.skill_categories.order_by("order")),
-        "certifications": list(resume.certifications.order_by("-date")),
+        "full_name": full_name,
+        "email": email,
+        "phone": phone,
+        "location": location,
+        "linkedin": linkedin,
+        "github": github,
+        "website": website,
+        "portfolio": website,
+        "summary": summary,
+        "education": edu_list,
+        "experience": exp_list,
+        "projects": proj_list,
+        "skill_categories": skill_cat_list,
+        "skills": all_flat_skills,
+        "certifications": cert_list,
         "target_role": resume.target_role,
-        # Helper: escape a value for LaTeX (usable inline in templates)
-        "e": lambda v: __import__("apps.generator.latex_utils", fromlist=["latex_escape"]).latex_escape(v),
+        "e": latex_escape,
     }
+

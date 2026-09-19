@@ -1,1 +1,16 @@
-﻿{"is_one_page_design":true,"is_active":true,"ats_friendly":false,"category":"two_column","engine":"xelatex","name":"Modern Deedy","supports_certifications":true,"supports_projects":true,"source_url":"https://github.com/posquit0/Awesome-CV","license":"LPPL 1.3c","supports_photo":false}
+{
+  "slug": "modern-deedy",
+  "name": "Modern Deedy",
+  "source_url": "https://www.overleaf.com/latex/templates/modern-deedy/cxtjgrmpsrvh",
+  "license": "Apache 2.0",
+  "engine": "xelatex",
+  "category": "single_column",
+  "style": "One-column Deedy fork",
+  "is_ats_friendly": true,
+  "supports_photo": false,
+  "supports_projects": true,
+  "supports_certifications": true,
+  "is_one_page_design": true,
+  "author": "Debarghya Das & Community",
+  "notes": "Sourced directly from Overleaf: Modern Deedy"
+}

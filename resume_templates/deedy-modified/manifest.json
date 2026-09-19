@@ -1,0 +1,16 @@
+{
+  "slug": "deedy-modified",
+  "name": "Modified Deedy Resume",
+  "source_url": "https://www.overleaf.com/latex/templates/modified-deedy-resume/nkbttgdpbvmy",
+  "license": "Apache 2.0",
+  "engine": "xelatex",
+  "category": "two_column",
+  "style": "Reordered Deedy variant",
+  "is_ats_friendly": false,
+  "supports_photo": false,
+  "supports_projects": true,
+  "supports_certifications": true,
+  "is_one_page_design": true,
+  "author": "Debarghya Das & Community",
+  "notes": "Sourced directly from Overleaf: Modified Deedy Resume"
+}

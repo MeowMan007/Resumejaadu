@@ -24,8 +24,8 @@
         <div class="aspect-[3/4] rounded-xl overflow-hidden mb-2 relative transition-all duration-200 ring-2
                     {% if resume.template_id == tmpl.pk %}ring-brand-500{% else %}ring-transparent group-hover:ring-brand-500/50{% endif %}"
              style="background: linear-gradient(145deg, #1a1a2e, #16213e);">
-          {% if tmpl.thumbnail %}
-            <img src="{{ tmpl.thumbnail.url }}" alt="{{ tmpl.name }}"
+          {% if tmpl.thumbnail_url %}
+            <img src="{{ tmpl.thumbnail_url }}" alt="{{ tmpl.name }}"
                  class="w-full h-full object-cover" />
           {% else %}
             <!-- Placeholder preview -->
@@ -39,8 +39,9 @@
 
           <!-- Selected badge -->
           {% if resume.template_id == tmpl.pk %}
-          <div class="absolute top-2 right-2 w-5 h-5 rounded-full bg-brand-500 flex items-center justify-center text-white text-xs font-bold">✓</div>
+          <div class="absolute top-2 right-2 w-6 h-6 rounded-full bg-brand-500 flex items-center justify-center text-white text-xs font-bold shadow-lg">✓</div>
           {% endif %}
+
 
           <!-- Badges overlay -->
           <div class="absolute bottom-2 left-2 flex flex-wrap gap-1">

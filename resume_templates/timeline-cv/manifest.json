@@ -1,0 +1,16 @@
+{
+  "slug": "timeline-cv",
+  "name": "Timeline CV",
+  "source_url": "https://www.overleaf.com/latex/templates/timeline-cv/nymhzxqdntmx",
+  "license": "Creative Commons CC BY 4.0",
+  "engine": "pdflatex",
+  "category": "creative",
+  "style": "Sidebar + visual timeline",
+  "is_ats_friendly": false,
+  "supports_photo": true,
+  "supports_projects": true,
+  "supports_certifications": true,
+  "is_one_page_design": false,
+  "author": "Timeline CV Contributors",
+  "notes": "Sourced directly from Overleaf: Timeline CV"
+}

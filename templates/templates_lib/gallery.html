@@ -36,10 +36,9 @@
         <div class="card-hover group flex flex-col justify-between overflow-hidden">
           
           <!-- Thumbnail / Preview -->
-          <div class="aspect-[3/4] rounded-xl overflow-hidden mb-4 relative transition-all duration-300 group-hover:scale-[1.02]"
-               style="background: linear-gradient(145deg, #1a1a2e, #16213e);">
-            {% if tmpl.thumbnail %}
-              <img src="{{ tmpl.thumbnail.url }}" alt="{{ tmpl.name }}"
+          <div class="aspect-[3/4] rounded-xl overflow-hidden mb-4 relative transition-all duration-300 group-hover:scale-[1.02] bg-dark-900 border border-white/5">
+            {% if tmpl.thumbnail_url %}
+              <img src="{{ tmpl.thumbnail_url }}" alt="{{ tmpl.name }}"
                    class="w-full h-full object-cover" />
             {% else %}
               <!-- Fallback preview mockup -->
@@ -60,10 +59,11 @@
 
             <!-- Top badges -->
             <div class="absolute top-3 left-3 flex flex-wrap gap-1">
-              <span class="px-2 py-0.5 text-[10px] font-medium rounded-full bg-dark-900/80 text-brand-300 border border-brand-500/30">
+              <span class="px-2 py-0.5 text-[10px] font-bold rounded-md bg-dark-950/90 text-brand-300 border border-brand-500/30">
                 {{ tmpl.get_engine_display }}
               </span>
             </div>
+
 
             <!-- Bottom badges -->
             <div class="absolute bottom-3 left-3 flex flex-wrap gap-1">

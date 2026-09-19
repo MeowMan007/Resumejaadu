@@ -1,0 +1,16 @@
+{
+  "slug": "jakes-resume",
+  "name": "Jake's Resume",
+  "source_url": "https://www.overleaf.com/latex/templates/jakes-resume/syzfjbzwjncs",
+  "license": "MIT",
+  "engine": "pdflatex",
+  "category": "single_column",
+  "style": "Minimal single-column",
+  "is_ats_friendly": true,
+  "supports_photo": false,
+  "supports_projects": true,
+  "supports_certifications": true,
+  "is_one_page_design": true,
+  "author": "Jake Gutierrez",
+  "notes": "Sourced directly from Overleaf: Jake's Resume"
+}

@@ -1,1 +1,16 @@
-﻿{"is_one_page_design":true,"is_active":true,"ats_friendly":false,"category":"single_column","engine":"xelatex","name":"Awesome CV","supports_certifications":true,"supports_projects":true,"source_url":"https://www.overleaf.com/latex/templates/awesome-cv/tvmzpvdjfqxp","license":"LPPL 1.3c","supports_photo":true}
+{
+  "slug": "awesome-cv",
+  "name": "Awesome CV",
+  "source_url": "https://www.overleaf.com/latex/templates/awesome-cv/dfnvtnhzhhbm",
+  "license": "LaTeX Project Public License 1.3c",
+  "engine": "xelatex",
+  "category": "two_column",
+  "style": "Two-tone, sidebar-style",
+  "is_ats_friendly": false,
+  "supports_photo": true,
+  "supports_projects": true,
+  "supports_certifications": true,
+  "is_one_page_design": false,
+  "author": "Claud D. Park (posquit0)",
+  "notes": "Sourced directly from Overleaf: Awesome CV"
+}
