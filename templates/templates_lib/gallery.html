@@ -1,107 +1,73 @@
 {% extends "base.html" %}
 {% block title %}LaTeX Resume Templates — ResumeJaadu{% endblock %}
-{% block meta_description %}Explore 20 professional LaTeX resume templates. Optimized for ATS and styled with modern design standards.{% endblock %}
+{% block meta_description %}Explore 20 professional LaTeX resume templates. Optimized for ATS and styled with modern design.{% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+<div class="container" style="padding: 48px 24px;">
 
   <!-- Header -->
-  <div class="text-center max-w-3xl mx-auto mb-12">
-    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium text-brand-300 mb-4"
-         style="background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.3);">
-      🎨 20 LaTeX Templates Ready
-    </div>
-    <h1 class="font-display text-4xl sm:text-5xl font-bold text-white mb-4">
+  <div style="text-align:center; max-width:640px; margin:0 auto 48px;">
+    <span class="badge badge-yellow mb-4">20 Templates Ready</span>
+    <h1 class="t-display" style="font-size: clamp(28px, 5vw, 42px); margin-bottom:12px;">
       Template Gallery
     </h1>
-    <p class="text-slate-400 text-base sm:text-lg">
-      Clean, ATS-compliant, and beautifully designed LaTeX templates compiled directly to pixel-perfect PDFs.
+    <p class="t-body" style="font-size:16px;">
+      Clean, ATS-compliant LaTeX templates compiled to pixel-perfect PDFs.
     </p>
   </div>
 
   <!-- Templates by Category -->
   {% if categories %}
-  <div class="space-y-12">
+  <div style="display:flex; flex-direction:column; gap:48px;">
     {% for category_name, tmpl_list in categories.items %}
     <div>
-      <div class="flex items-center gap-3 mb-6 pb-2 border-b border-white/5">
-        <h2 class="font-display text-xl font-bold text-white">{{ category_name }}</h2>
-        <span class="text-xs px-2.5 py-0.5 rounded-full bg-white/5 text-slate-400 border border-white/10">
-          {{ tmpl_list|length }} template{{ tmpl_list|length|pluralize }}
-        </span>
+      <div class="flex items-center gap-3 mb-6" style="padding-bottom:8px; border-bottom:1px solid var(--black-3);">
+        <h2 class="t-heading" style="font-size:20px;">{{ category_name }}</h2>
+        <span class="badge">{{ tmpl_list|length }}</span>
       </div>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      <div class="grid grid-4">
         {% for tmpl in tmpl_list %}
-        <div class="card-hover group flex flex-col justify-between overflow-hidden">
-          
-          <!-- Thumbnail / Preview -->
-          <div class="aspect-[3/4] rounded-xl overflow-hidden mb-4 relative transition-all duration-300 group-hover:scale-[1.02] bg-dark-900 border border-white/5">
+        <div class="tmpl-card">
+
+          <div class="tmpl-thumb">
             {% if tmpl.thumbnail_url %}
-              <img src="{{ tmpl.thumbnail_url }}" alt="{{ tmpl.name }}"
-                   class="w-full h-full object-cover" />
+              <img src="{{ tmpl.thumbnail_url }}" alt="{{ tmpl.name }}" />
             {% else %}
-              <!-- Fallback preview mockup -->
-              <div class="w-full h-full flex flex-col justify-center items-center p-6 text-center">
-                <div class="w-12 h-12 rounded-2xl flex items-center justify-center text-xl mb-3"
-                     style="background: rgba(99,102,241,0.2); border: 1px solid rgba(99,102,241,0.3);">
-                  📄
-                </div>
-                <p class="text-xs font-semibold text-slate-300">{{ tmpl.name }}</p>
-                <div class="w-12 h-1 bg-brand-500/40 rounded-full my-2"></div>
-                <div class="space-y-1.5 w-full max-w-[140px]">
-                  <div class="h-1 bg-slate-700/60 rounded"></div>
-                  <div class="h-1 bg-slate-700/40 rounded w-4/5 mx-auto"></div>
-                  <div class="h-1 bg-slate-700/50 rounded w-3/4 mx-auto"></div>
-                </div>
+              <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; gap:8px; padding:20px;">
+                <span style="font-size:28px;">📄</span>
+                <p style="font-size:12px; font-weight:600; color:var(--gray-lt);">{{ tmpl.name }}</p>
+                <div style="width:40px; height:2px; background:var(--yellow-d); border-radius:1px; opacity:0.5;"></div>
               </div>
             {% endif %}
 
-            <!-- Top badges -->
-            <div class="absolute top-3 left-3 flex flex-wrap gap-1">
-              <span class="px-2 py-0.5 text-[10px] font-bold rounded-md bg-dark-950/90 text-brand-300 border border-brand-500/30">
-                {{ tmpl.get_engine_display }}
-              </span>
+            <!-- Badges -->
+            <div style="position:absolute; top:8px; left:8px;">
+              <span class="badge">{{ tmpl.get_engine_display }}</span>
             </div>
 
-
-            <!-- Bottom badges -->
-            <div class="absolute bottom-3 left-3 flex flex-wrap gap-1">
+            <div style="position:absolute; bottom:8px; left:8px; display:flex; gap:4px;">
               {% if tmpl.ats_friendly %}
-              <span class="px-2 py-0.5 text-[10px] font-semibold rounded bg-emerald-950/80 text-emerald-400 border border-emerald-500/30">
-                ✓ ATS-Clean
-              </span>
+              <span class="badge badge-green" style="font-size:10px; padding:2px 6px;">ATS</span>
               {% endif %}
               {% if tmpl.supports_photo %}
-              <span class="px-2 py-0.5 text-[10px] font-semibold rounded bg-purple-950/80 text-purple-300 border border-purple-500/30">
-                📷 Photo
-              </span>
+              <span class="badge" style="font-size:10px; padding:2px 6px;">📷 Photo</span>
               {% endif %}
             </div>
           </div>
 
-          <!-- Meta -->
-          <div class="flex-1 flex flex-col justify-between">
-            <div>
-              <h3 class="font-display font-semibold text-white text-base group-hover:text-brand-400 transition-colors">
-                {{ tmpl.name }}
-              </h3>
-              <p class="text-xs text-slate-400 mt-1 line-clamp-2">
-                {{ tmpl.description|default:"Professional LaTeX layout built for high readability." }}
-              </p>
-            </div>
+          <div class="tmpl-meta">
+            <p class="tmpl-name">{{ tmpl.name }}</p>
+            <p class="t-small mt-1" style="display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; font-size:12px; line-height:1.5;">
+              {{ tmpl.description|default:"Professional LaTeX layout built for high readability." }}
+            </p>
 
-            <!-- Action button -->
-            <div class="mt-4 pt-3 border-t border-white/5 flex items-center justify-between">
-              <span class="text-[11px] text-slate-500 font-mono">License: {{ tmpl.license|default:"MIT" }}</span>
+            <div class="flex justify-between items-center mt-3" style="padding-top:10px; border-top:1px solid var(--black-3);">
+              <span style="font-size:11px; font-family:monospace; color:var(--gray);">{{ tmpl.license|default:"MIT" }}</span>
               {% if user.is_authenticated %}
-                <a href="{% url 'resumes:create_resume' %}" class="text-xs text-brand-400 hover:text-white font-medium transition-colors">
-                  Use Template →
-                </a>
+                <a href="{% url 'resumes:create_resume' %}" style="font-size:12px; font-weight:600; color:var(--yellow);">Use →</a>
               {% else %}
-                <a href="{% url 'account_signup' %}" class="text-xs text-brand-400 hover:text-white font-medium transition-colors">
-                  Start Free →
-                </a>
+                <a href="{% url 'account_signup' %}" style="font-size:12px; font-weight:600; color:var(--yellow);">Start Free →</a>
               {% endif %}
             </div>
           </div>
@@ -113,28 +79,25 @@
     {% endfor %}
   </div>
   {% else %}
-  <div class="text-center py-24 glass rounded-2xl max-w-lg mx-auto">
-    <p class="text-5xl mb-4">🎨</p>
-    <h2 class="text-xl font-bold text-white mb-2">No templates loaded yet</h2>
-    <p class="text-slate-400 text-sm mb-6">
-      Run the sync command to discover and register all 20 LaTeX templates into the database:
-    </p>
-    <code class="px-4 py-2 rounded-lg bg-dark-900 border border-white/10 text-brand-300 text-xs font-mono">
+  <div class="card" style="text-align:center; padding:48px; max-width:480px; margin:0 auto;">
+    <p style="font-size:32px; margin-bottom:12px;">🎨</p>
+    <h2 class="t-heading" style="font-size:20px; margin-bottom:8px;">No templates loaded</h2>
+    <p class="t-small mb-4">Run the sync command to load all 20 templates:</p>
+    <code style="display:inline-block; background:var(--black-3); border:1px solid var(--black-4); border-radius:4px; padding:6px 12px; font-size:12px; color:var(--yellow);">
       python manage.py sync_templates
     </code>
   </div>
   {% endif %}
 
   <!-- Bottom CTA -->
-  <div class="mt-16 text-center py-12 rounded-2xl"
-       style="background: linear-gradient(135deg, rgba(99,102,241,0.1), rgba(139,92,246,0.05)); border: 1px solid rgba(99,102,241,0.2);">
-    <h2 class="font-display text-2xl font-bold text-white mb-2">Ready to craft your resume?</h2>
-    <p class="text-slate-400 text-sm mb-6 max-w-md mx-auto">
-      Create an ATS-friendly, LaTeX-compiled resume in under 10 minutes with AI writing assistance.
+  <div class="card mt-8" style="text-align:center; padding:48px 32px; border-color:rgba(232,185,49,0.2);">
+    <h2 class="t-heading" style="font-size:24px; margin-bottom:8px;">Ready to build your resume?</h2>
+    <p class="t-body mb-6" style="max-width:400px; margin:0 auto 24px;">
+      Create an ATS-friendly LaTeX resume in under 10 minutes with AI assistance.
     </p>
     <a href="{% if user.is_authenticated %}{% url 'resumes:create_resume' %}{% else %}{% url 'account_signup' %}{% endif %}"
-       class="btn-primary text-sm px-8 py-3">
-      ✨ Create My Resume Now
+       class="btn btn-primary">
+      Create My Resume →
     </a>
   </div>
 

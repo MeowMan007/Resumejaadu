@@ -2,126 +2,140 @@
 {% block title %}Review & Download — {{ resume.title }}{% endblock %}
 
 {% block step_content %}
-<div class="space-y-6">
+<div class="grid grid-2" style="gap:24px;">
 
-  <!-- Summary preview card -->
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+  <!-- Left: Data summary -->
+  <div style="font-size:14px; color:var(--gray-lt);">
 
-    <!-- Left: Data summary -->
-    <div class="space-y-4 text-sm text-slate-300">
-
-      <!-- Personal -->
-      {% if personal %}
-      <div>
-        <h3 class="font-display font-semibold text-white mb-1">👤 {{ personal.full_name }}</h3>
-        <p class="text-slate-400">{{ personal.email }} {% if personal.phone %}· {{ personal.phone }}{% endif %}</p>
-        {% if personal.location %}<p class="text-slate-400">📍 {{ personal.location }}</p>{% endif %}
-        {% if personal.summary %}
-        <p class="mt-2 text-slate-300 leading-relaxed text-xs border-l-2 border-brand-500/40 pl-3">{{ personal.summary|truncatechars:280 }}</p>
-        {% endif %}
-      </div>
+    {% if personal %}
+    <div style="margin-bottom:16px;">
+      <h3 class="t-heading" style="font-size:16px; margin-bottom:4px;">{{ personal.full_name }}</h3>
+      <p class="t-small">{{ personal.email }} {% if personal.phone %}· {{ personal.phone }}{% endif %}</p>
+      {% if personal.location %}<p class="t-small">{{ personal.location }}</p>{% endif %}
+      {% if personal.summary %}
+      <p style="margin-top:8px; font-size:13px; color:var(--gray-lt); line-height:1.6; border-left:2px solid var(--yellow-d); padding-left:12px;">
+        {{ personal.summary|truncatechars:280 }}
+      </p>
       {% endif %}
+    </div>
+    {% endif %}
 
-      <!-- Experience -->
-      {% if experience %}
-      <div>
-        <p class="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Experience</p>
-        {% for exp in experience %}
-        <div class="mb-1">
-          <span class="font-medium text-slate-200">{{ exp.role }}</span>
-          <span class="text-slate-500"> at {{ exp.company }}</span>
-          {% if exp.start_date %}<span class="text-slate-600 text-xs ml-1">({{ exp.start_date|date:"M Y" }} – {% if exp.is_current %}Present{% else %}{{ exp.end_date|date:"M Y" }}{% endif %})</span>{% endif %}
-        </div>
+    {% if experience %}
+    <div style="margin-bottom:16px;">
+      <p class="t-label mb-2">Experience</p>
+      {% for exp in experience %}
+      <div style="margin-bottom:4px;">
+        <span style="font-weight:600; color:var(--white);">{{ exp.role }}</span>
+        <span class="t-small"> at {{ exp.company }}</span>
+        {% if exp.start_date %}<span class="t-small" style="margin-left:4px;">({{ exp.start_date|date:"M Y" }} – {% if exp.is_current %}Present{% else %}{{ exp.end_date|date:"M Y" }}{% endif %})</span>{% endif %}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if education %}
+    <div style="margin-bottom:16px;">
+      <p class="t-label mb-2">Education</p>
+      {% for edu in education %}
+      <div style="margin-bottom:4px;">
+        <span style="font-weight:600; color:var(--white);">{{ edu.degree }}</span>
+        <span class="t-small"> · {{ edu.institution }}</span>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if skills %}
+    <div style="margin-bottom:16px;">
+      <p class="t-label mb-2">Skills</p>
+      {% for sc in skills %}
+      <div class="flex gap-2 mb-2" style="flex-wrap:wrap; align-items:center;">
+        <span style="font-weight:500; color:var(--gray-lt);">{{ sc.name }}:</span>
+        {% for item in sc.items %}
+        <span class="badge badge-yellow" style="font-size:11px;">{{ item }}</span>
         {% endfor %}
       </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <div style="padding-top:12px; border-top:1px solid var(--black-3);">
+      <p class="t-label mb-1">Template</p>
+      {% if resume.template %}
+      <span style="color:var(--white); font-weight:500;">{{ resume.template.name }}</span>
+      <span class="t-small"> ({{ resume.template.get_engine_display }})</span>
+      {% else %}
+      <span style="color:var(--yellow); font-size:13px;">⚠ No template — go back to select one.</span>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Right: PDF Generation -->
+  <div>
+    <div class="card" style="text-align:center; border-color: rgba(232,185,49,0.2);">
+      <h2 class="t-heading" style="font-size:18px; margin-bottom:8px;">Generate PDF</h2>
+      <p class="t-small mb-4">Compile your resume through LaTeX for a pixel-perfect PDF.</p>
+
+      {% if resume.template %}
+      <button id="generate-btn"
+              hx-post="{% url 'resumes:generate_pdf' pk=resume.pk %}"
+              hx-target="#pdf-status-panel"
+              hx-swap="innerHTML"
+              class="btn btn-primary btn-block">
+        Generate PDF
+      </button>
+      {% else %}
+      <a href="{% url 'resumes:wizard_step' pk=resume.pk step='template' %}" class="btn btn-outline btn-block">
+        ← Select a Template First
+      </a>
       {% endif %}
 
-      <!-- Education -->
-      {% if education %}
-      <div>
-        <p class="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Education</p>
-        {% for edu in education %}
-        <div class="mb-1">
-          <span class="font-medium text-slate-200">{{ edu.degree }}</span>
-          <span class="text-slate-500"> · {{ edu.institution }}</span>
-        </div>
-        {% endfor %}
-      </div>
-      {% endif %}
-
-      <!-- Skills -->
-      {% if skills %}
-      <div>
-        <p class="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Skills</p>
-        {% for sc in skills %}
-        <div class="flex gap-2 mb-1 flex-wrap">
-          <span class="text-slate-400 font-medium">{{ sc.name }}:</span>
-          {% for item in sc.items %}
-          <span class="px-2 py-0.5 rounded text-xs" style="background:rgba(99,102,241,0.12);border:1px solid rgba(99,102,241,0.2);color:#a5b4fc;">{{ item }}</span>
-          {% endfor %}
-        </div>
-        {% endfor %}
-      </div>
-      {% endif %}
-
-      <!-- Template info -->
-      <div class="pt-2 border-t border-white/5">
-        <p class="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Selected Template</p>
-        {% if resume.template %}
-        <span class="text-slate-200">{{ resume.template.name }}</span>
-        <span class="text-slate-500 text-xs"> ({{ resume.template.get_engine_display }})</span>
+      <div id="pdf-status-panel" style="margin-top:16px;">
+        {% if latest_pdf %}
+          {% include "resumes/partials/pdf_status.html" with gen=latest_pdf resume=resume %}
         {% else %}
-        <span class="text-amber-400 text-xs">⚠ No template selected — go back to the Template step.</span>
+          <p class="t-small">No PDFs generated yet.</p>
         {% endif %}
       </div>
     </div>
 
-    <!-- Right: PDF Generation panel -->
-    <div class="flex flex-col gap-4">
-      <div class="rounded-xl p-5 text-center space-y-4"
-           style="background: rgba(99,102,241,0.06); border: 1px solid rgba(99,102,241,0.2);">
+    <!-- Quick edit links -->
+    <div class="card mt-4" style="padding:16px;">
+      <p class="t-label mb-2">Edit Sections</p>
+      {% for s in steps_info %}
+      {% if s.id != 'review' %}
+      <a href="{% url 'resumes:wizard_step' pk=resume.pk step=s.id %}"
+         class="flex justify-between items-center"
+         style="font-size:13px; color:var(--gray-lt); padding:6px 0; border-bottom:1px solid var(--black-3); transition: color 0.1s;">
+        <span>{{ s.title }}</span>
+        <span style="font-size:12px; color:var(--yellow);">Edit →</span>
+      </a>
+      {% endif %}
+      {% endfor %}
+    </div>
 
-        <h2 class="font-display font-bold text-white">Generate PDF</h2>
-        <p class="text-slate-400 text-sm">Compile your resume through LaTeX to get a pixel-perfect PDF.</p>
-
-        {% if resume.template %}
-        <button id="generate-btn"
-                hx-post="{% url 'resumes:generate_pdf' pk=resume.pk %}"
-                hx-target="#pdf-status-panel"
-                hx-swap="innerHTML"
-                class="btn-primary w-full justify-center text-center">
-          ⚡ Generate PDF
+    <!-- Resume Actions -->
+    <div class="card mt-4" style="padding:16px;" x-data="{ showDeleteConfirm: false }">
+      <p class="t-label mb-2">Manage Resume</p>
+      <div class="flex gap-2">
+        <form method="post" action="{% url 'resumes:duplicate_resume' pk=resume.pk %}" style="flex:1;">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-outline btn-sm btn-block">📋 Duplicate</button>
+        </form>
+        <button type="button" @click="showDeleteConfirm = true" class="btn btn-danger btn-sm" style="flex:1;">
+          🗑 Delete
         </button>
-        {% else %}
-        <a href="{% url 'resumes:wizard_step' pk=resume.pk step='template' %}"
-           class="btn-secondary w-full text-center block">
-          ← Select a Template First
-        </a>
-        {% endif %}
-
-        <!-- Status panel -->
-        <div id="pdf-status-panel">
-          {% if latest_pdf %}
-            {% include "resumes/partials/pdf_status.html" with gen=latest_pdf resume=resume %}
-          {% else %}
-            <p class="text-slate-500 text-sm">No PDFs generated yet.</p>
-          {% endif %}
-        </div>
       </div>
 
-      <!-- Edit links -->
-      <div class="rounded-xl p-4 space-y-2"
-           style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05);">
-        <p class="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-2">Edit Sections</p>
-        {% for s in steps_info %}
-        {% if s.id != 'review' %}
-        <a href="{% url 'resumes:wizard_step' pk=resume.pk step=s.id %}"
-           class="flex items-center justify-between text-sm text-slate-400 hover:text-white transition-colors py-1 border-b border-white/5">
-          <span>{{ s.title }}</span>
-          <span class="text-xs text-brand-400">Edit →</span>
-        </a>
-        {% endif %}
-        {% endfor %}
+      <div x-show="showDeleteConfirm" x-cloak style="margin-top:12px; padding:12px; background:var(--black-2); border:1px solid var(--red); border-radius:6px; text-align:center;">
+        <p style="font-size:13px; font-weight:600; color:var(--white); margin-bottom:8px;">Permanently delete this resume?</p>
+        <div class="flex gap-2 justify-center">
+          <button type="button" @click="showDeleteConfirm = false" class="btn btn-outline btn-sm">Cancel</button>
+          <form method="post" action="{% url 'resumes:delete_resume' pk=resume.pk %}" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger btn-sm">Yes, Delete</button>
+          </form>
+        </div>
       </div>
     </div>
   </div>
@@ -129,6 +143,5 @@
 {% endblock %}
 
 {% block nav_buttons %}
-<!-- No submit button on review step — actions are in the panel -->
 <div></div>
 {% endblock %}

@@ -5,76 +5,152 @@
 <form method="post" id="wizard-form">
   {% csrf_token %}
 
+  <!-- Community Favorites Section -->
+  {% if community_templates %}
+  <div style="margin-bottom: 36px; padding-bottom: 24px; border-bottom: 1px solid var(--black-4);">
+    <div class="flex items-center gap-2 mb-2">
+      <span class="badge badge-yellow" style="font-size: 11px;">⭐ Community Top Rated</span>
+      <span class="badge badge-green" style="font-size: 11px;">100% Tested & ATS Compliant</span>
+    </div>
+    <h2 class="t-heading" style="font-size: 18px; margin-bottom: 6px;">Recommended Community Templates</h2>
+    <p class="t-small mb-4">Highly rated layouts across Overleaf, GitHub, and r/EngineeringResumes. Select one to use with your resume.</p>
+
+    <div class="grid grid-3 gap-4 mb-4">
+      {% for tmpl in community_templates %}
+      <label style="cursor:pointer; position:relative; margin:0;" for="tmpl_{{ tmpl.slug }}">
+        <input type="radio" name="template_slug" id="tmpl_{{ tmpl.slug }}" value="{{ tmpl.slug }}"
+               style="position:absolute; opacity:0; pointer-events:none;"
+               {% if resume.template_id == tmpl.pk %}checked{% endif %}>
+
+        <div class="tmpl-card" id="tcard_{{ tmpl.slug }}" style="height:100%; display:flex; flex-direction:column; justify-content:space-between; border-radius:8px; border: 1.5px solid {% if resume.template_id == tmpl.pk %}var(--yellow){% else %}var(--black-4){% endif %}; background: {% if resume.template_id == tmpl.pk %}rgba(232,185,49,0.05){% else %}var(--black-3){% endif %};">
+          <div class="tmpl-thumb" style="height:120px;">
+            {% if tmpl.thumbnail_url %}
+              <img src="{{ tmpl.thumbnail_url }}" alt="{{ tmpl.name }}" />
+            {% else %}
+              <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; gap:4px; padding:12px;">
+                <span style="font-size: 26px;">📄</span>
+                <span style="font-size: 11px; color: var(--gray-lt); font-weight: 600;">{{ tmpl.name }}</span>
+              </div>
+            {% endif %}
+
+            <div class="check-badge" style="position:absolute; top:6px; right:6px; width:22px; height:22px; border-radius:4px; background:var(--yellow); color:var(--black); display:{% if resume.template_id == tmpl.pk %}flex{% else %}none{% endif %}; align-items:center; justify-content:center; font-size:12px; font-weight:700;">✓</div>
+
+            <div style="position:absolute; bottom:6px; left:6px; display:flex; gap:4px;">
+              {% if tmpl.ats_friendly %}
+              <span class="badge badge-green" style="font-size:10px; padding:2px 6px;">ATS</span>
+              {% endif %}
+              <span class="badge" style="font-size:10px; padding:2px 6px;">{{ tmpl.get_engine_display }}</span>
+            </div>
+          </div>
+
+          <div class="tmpl-meta" style="padding:12px 14px;">
+            <p class="tmpl-name" style="font-size:13px; font-weight:700; color:var(--white);">{{ tmpl.name }}</p>
+            <p class="t-small mt-1" style="font-size:11px; color:var(--gray-lt); line-height:1.4;">
+              {% if tmpl.slug == "jakes-resume" %}
+                #1 Overleaf/Reddit tech resume standard. Ultra-clean single column.
+              {% elif tmpl.slug == "faangpath-simple" %}
+                Engineered for maximum ATS parsing rate by FAANG developers.
+              {% elif tmpl.slug == "swe-resume" %}
+                Modern software developer template with high technical density.
+              {% elif tmpl.slug == "moderncv-classic" %}
+                Authoritative classic CV layout, clean and versatile.
+              {% else %}
+                Sleek two-column design with balanced visual hierarchy.
+              {% endif %}
+            </p>
+          </div>
+        </div>
+      </label>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- All Templates by Category -->
   <div class="mb-4">
-    <p class="text-slate-400 text-sm">Click a template to select it. Hover to preview details.</p>
+    <h2 class="t-heading" style="font-size: 18px; margin-bottom: 6px;">All Templates</h2>
+    <p class="t-small mb-4">Browse all 20 LaTeX templates categorized by structure.</p>
   </div>
 
   {% if categories %}
   {% for category, tmpl_list in categories.items %}
-  <div class="mb-8">
-    <h2 class="font-display text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3">{{ category }}</h2>
-    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+  <div style="margin-bottom: 28px;">
+    <p class="t-label mb-3" style="font-size: 13px; color: var(--yellow);">{{ category }}</p>
+    <div class="grid grid-4 gap-3">
       {% for tmpl in tmpl_list %}
-      <label class="template-card group cursor-pointer relative" for="tmpl_{{ tmpl.slug }}">
-        <input type="radio" name="template_slug" id="tmpl_{{ tmpl.slug }}" value="{{ tmpl.slug }}"
-               class="sr-only"
+      <label style="cursor:pointer; position:relative; margin:0;" for="tmpl_all_{{ tmpl.slug }}">
+        <input type="radio" name="template_slug" id="tmpl_all_{{ tmpl.slug }}" value="{{ tmpl.slug }}"
+               style="position:absolute; opacity:0; pointer-events:none;"
                {% if resume.template_id == tmpl.pk %}checked{% endif %}>
 
-        <!-- Thumbnail -->
-        <div class="aspect-[3/4] rounded-xl overflow-hidden mb-2 relative transition-all duration-200 ring-2
-                    {% if resume.template_id == tmpl.pk %}ring-brand-500{% else %}ring-transparent group-hover:ring-brand-500/50{% endif %}"
-             style="background: linear-gradient(145deg, #1a1a2e, #16213e);">
-          {% if tmpl.thumbnail_url %}
-            <img src="{{ tmpl.thumbnail_url }}" alt="{{ tmpl.name }}"
-                 class="w-full h-full object-cover" />
-          {% else %}
-            <!-- Placeholder preview -->
-            <div class="w-full h-full flex flex-col justify-center items-center gap-2 p-3">
-              <div class="w-8 h-1 rounded-full bg-brand-500/60 mb-1"></div>
-              {% for _ in "12345678"|make_list %}
-              <div class="w-full h-0.5 rounded bg-slate-600/40"></div>
-              {% endfor %}
+        <div class="tmpl-card" id="tcard_all_{{ tmpl.slug }}" style="border-radius:6px; border: 1.5px solid {% if resume.template_id == tmpl.pk %}var(--yellow){% else %}var(--black-4){% endif %}; background: {% if resume.template_id == tmpl.pk %}rgba(232,185,49,0.05){% else %}var(--black-3){% endif %};">
+          <div class="tmpl-thumb" style="height:90px;">
+            {% if tmpl.thumbnail_url %}
+              <img src="{{ tmpl.thumbnail_url }}" alt="{{ tmpl.name }}" />
+            {% else %}
+              <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; height:100%; gap:4px; padding:8px;">
+                <span style="font-size: 20px;">📄</span>
+              </div>
+            {% endif %}
+
+            <div class="check-badge" style="position:absolute; top:4px; right:4px; width:18px; height:18px; border-radius:3px; background:var(--yellow); color:var(--black); display:{% if resume.template_id == tmpl.pk %}flex{% else %}none{% endif %}; align-items:center; justify-content:center; font-size:11px; font-weight:700;">✓</div>
+
+            <div style="position:absolute; bottom:4px; left:4px; display:flex; gap:3px;">
+              {% if tmpl.ats_friendly %}
+              <span class="badge badge-green" style="font-size:9px; padding:1px 4px;">ATS</span>
+              {% endif %}
             </div>
-          {% endif %}
+          </div>
 
-          <!-- Selected badge -->
-          {% if resume.template_id == tmpl.pk %}
-          <div class="absolute top-2 right-2 w-6 h-6 rounded-full bg-brand-500 flex items-center justify-center text-white text-xs font-bold shadow-lg">✓</div>
-          {% endif %}
-
-
-          <!-- Badges overlay -->
-          <div class="absolute bottom-2 left-2 flex flex-wrap gap-1">
-            {% if tmpl.ats_friendly %}
-            <span class="px-1.5 py-0.5 text-[10px] font-medium rounded bg-green-900/80 text-green-300">ATS</span>
-            {% endif %}
-            {% if tmpl.supports_photo %}
-            <span class="px-1.5 py-0.5 text-[10px] font-medium rounded bg-purple-900/80 text-purple-300">📷</span>
-            {% endif %}
+          <div class="tmpl-meta" style="padding:8px 10px;">
+            <p class="tmpl-name" style="font-size:12px; font-weight:600;">{{ tmpl.name }}</p>
+            <p class="t-small" style="font-size:10px; color:var(--gray);">{{ tmpl.get_engine_display }}</p>
           </div>
         </div>
-
-        <!-- Template name + engine -->
-        <p class="text-xs font-medium text-slate-200 truncate">{{ tmpl.name }}</p>
-        <p class="text-[10px] text-slate-500">{{ tmpl.get_engine_display }}</p>
       </label>
       {% endfor %}
     </div>
   </div>
   {% endfor %}
   {% else %}
-  <div class="text-center py-12 text-slate-500">
-    <p class="text-4xl mb-3">🎨</p>
-    <p>No templates loaded yet. Run <code class="bg-slate-800 px-1 rounded text-xs">python manage.py sync_templates</code> to load them.</p>
+  <div style="text-align:center; padding:40px; color:var(--gray);">
+    <p style="font-size:28px; margin-bottom:12px;">🎨</p>
+    <p>No templates loaded yet.</p>
   </div>
   {% endif %}
 
-  <div class="flex justify-end mt-4">
-    <button type="submit" name="save_draft" value="1" class="btn-secondary text-sm">Save Selection</button>
+  <div class="flex justify-between items-center mt-6 pt-4" style="border-top:1px solid var(--black-4);">
+    <span class="t-small" style="color:var(--gray);">Selection saves automatically when you continue.</span>
+    <button type="submit" name="save_draft" value="1" class="btn btn-outline btn-sm">Save Selection</button>
   </div>
 </form>
 
-<style>
-  .template-card input:checked ~ div { outline: 2px solid #6366f1; }
-</style>
+<script>
+  // Instant visual feedback on radio click
+  document.querySelectorAll('input[name="template_slug"]').forEach(function(radio) {
+    radio.addEventListener('change', function() {
+      var selectedVal = this.value;
+      // Sync both top and category lists
+      document.querySelectorAll('input[name="template_slug"]').forEach(function(r) {
+        var card = r.closest('label').querySelector('.tmpl-card');
+        var badge = card ? card.querySelector('.check-badge') : null;
+        if (r.value === selectedVal) {
+          r.checked = true;
+          if (card) {
+            card.style.borderColor = 'var(--yellow)';
+            card.style.background = 'rgba(232, 185, 49, 0.05)';
+          }
+          if (badge) badge.style.display = 'flex';
+        } else {
+          r.checked = false;
+          if (card) {
+            card.style.borderColor = 'var(--black-4)';
+            card.style.background = 'var(--black-3)';
+          }
+          if (badge) badge.style.display = 'none';
+        }
+      });
+    });
+  });
+</script>
 {% endblock %}
