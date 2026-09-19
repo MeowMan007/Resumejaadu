@@ -7,6 +7,7 @@
 [![Celery](https://img.shields.io/badge/Celery-5.x-brightgreen?logo=celery)](https://docs.celeryq.dev)
 [![Redis](https://img.shields.io/badge/Redis-7-red?logo=redis)](https://redis.io)
 [![LaTeX](https://img.shields.io/badge/LaTeX-TeX_Live-blue?logo=latex)](https://tug.org/texlive)
+[![Vercel](https://img.shields.io/badge/Vercel-Ready-black?logo=vercel)](VERCEL_DEPLOYMENT.md)
 [![License](https://img.shields.io/badge/License-MIT-yellow)](LICENSE)
 
 ---
@@ -99,6 +100,18 @@ python manage.py runserver
 ```
 
 > **Note:** PDF generation won't work without TeX Live. Use Docker for full functionality.
+
+---
+
+## ⚡ Vercel Deployment
+
+ResumeJaadu is ready for zero-configuration serverless deployment on Vercel:
+
+1. Import repository at [vercel.com/new](https://vercel.com/new) (auto-detects Django framework).
+2. Set `DATABASE_URL` (e.g. Neon, Supabase, Railway) and `SECRET_KEY` in Vercel Environment Variables.
+3. Deploy! Static assets are served globally via Vercel CDN with WhiteNoise.
+
+See the complete [Vercel Deployment Guide](VERCEL_DEPLOYMENT.md) for full configuration details.
 
 ---
 
