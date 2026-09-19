@@ -3,7 +3,7 @@
   "name": "AltaCV",
   "source_url": "https://www.overleaf.com/latex/templates/altacv-template/trgqjpwnmtgv",
   "license": "LaTeX Project Public License 1.3",
-  "engine": "pdflatex",
+  "engine": "lualatex",
   "category": "two_column",
   "style": "Colorful sidebar",
   "is_ats_friendly": false,

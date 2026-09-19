@@ -22,12 +22,7 @@
 
 \begin{center}
     {\Huge \scshape \textbf{\VAR{full_name}}} \\ \vspace{2pt}
-    \small
-    \BLOCK{ if phone }\VAR{phone} $\cdot$\BLOCK{ endif }
-    \BLOCK{ if email }\href{mailto:\VAR{email}}{\VAR{email}} $\cdot$\BLOCK{ endif }
-    \BLOCK{ if linkedin }\href{\VAR{linkedin}}{LinkedIn} $\cdot$\BLOCK{ endif }
-    \BLOCK{ if github }\href{\VAR{github}}{GitHub} $\cdot$\BLOCK{ endif }
-    \BLOCK{ if location }\VAR{location}\BLOCK{ endif }
+    \small \VAR{contact_line_dot}
 \end{center}
 
 \BLOCK{ if summary }
@@ -71,7 +66,6 @@
 \textbf{\VAR{proj.title}} \BLOCK{ if proj.technologies }($|$\textit{\VAR{proj.technologies}})\BLOCK{ endif } \hfill \BLOCK{ if proj.link }\href{\VAR{proj.link}}{Link}\BLOCK{ endif }
 \begin{itemize}[leftmargin=0.2in, topsep=2pt, itemsep=1pt]
     \BLOCK{ if proj.description }\item \small{\VAR{proj.description}}\BLOCK{ endif }
-    \BLOCK{ for b in proj.bullets }\item \small{\VAR{b}}\BLOCK{ endfor }
 \end{itemize}
 \vspace{2pt}
 \BLOCK{ endfor }

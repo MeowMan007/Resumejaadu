@@ -4,7 +4,7 @@
 \documentclass{resume}
 
 \usepackage[left=0.5in,top=0.5in,right=0.5in,bottom=0.5in]{geometry}
-\usepackage[hidelinks]{hyperref}
+\hypersetup{hidelinks}
 \newcommand{\tab}[1]{\hspace{.2667\textwidth}\rlap{#1}}
 \newcommand{\itab}[1]{\hspace{0em}\rlap{#1}}
 
@@ -52,7 +52,6 @@
 \begin{itemize}
     \itemsep -3pt {}
     \BLOCK{ if proj.description }\item \VAR{proj.description}\BLOCK{ endif }
-    \BLOCK{ for b in proj.bullets }\item \VAR{b}\BLOCK{ endfor }
 \end{itemize}
 \BLOCK{ endfor }
 \end{rSection}

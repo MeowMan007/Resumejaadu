@@ -23,10 +23,12 @@
 \begin{center}
     {\Huge \textbf{\color{primary}\VAR{full_name}}} \\ \vspace{4pt}
     \small \color{text}
-    \BLOCK{ if email }\href{mailto:\VAR{email}}{\VAR{email}} \quad$\vert$\quad\BLOCK{ endif }
-    \BLOCK{ if phone }\VAR{phone} \quad$\vert$\quad\BLOCK{ endif }
-    \BLOCK{ if location }\VAR{location} \quad$\vert$\quad\BLOCK{ endif }
-    \BLOCK{ if linkedin }\href{\VAR{linkedin}}{LinkedIn}\BLOCK{ endif }
+    \BLOCK{ set sep = joiner(" $|$ ") }
+    \BLOCK{ if email }\VAR{sep()}\href{mailto:\VAR{email}}{\VAR{email}}\BLOCK{ endif }
+    \BLOCK{ if phone }\VAR{sep()}\VAR{phone}\BLOCK{ endif }
+    \BLOCK{ if location }\VAR{sep()}\VAR{location}\BLOCK{ endif }
+    \BLOCK{ if linkedin }\VAR{sep()}\href{\VAR{linkedin}}{LinkedIn}\BLOCK{ endif }
+    \BLOCK{ if github }\VAR{sep()}\href{\VAR{github}}{GitHub}\BLOCK{ endif }
 \end{center}
 \vspace{6pt}
 

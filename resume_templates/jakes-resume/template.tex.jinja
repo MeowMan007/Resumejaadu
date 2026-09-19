@@ -48,7 +48,7 @@
 
 \newcommand{\resumeSubheading}[4]{
   \vspace{-2pt}\item
-    \begin{tabular*}{0.97\textwidth}[t]{l@{\extracolsep{\fill}}r}
+    \begin{tabular*}{\linewidth}[t]{l@{\extracolsep{\fill}}r}
       \textbf{#1} & #2 \\
       \textit{\small#3} & \textit{\small #4} \\
     \end{tabular*}\vspace{-7pt}
@@ -56,7 +56,7 @@
 
 \newcommand{\resumeProjectHeading}[2]{
     \item
-    \begin{tabular*}{0.97\textwidth}{l@{\extracolsep{\fill}}r}
+    \begin{tabular*}{\linewidth}{l@{\extracolsep{\fill}}r}
       \small#1 & #2 \\
     \end{tabular*}\vspace{-7pt}
 }
@@ -72,13 +72,8 @@
 
 %----------HEADING----------
 \begin{center}
-    \textbf{\Huge \scshape \VAR{full_name}} \\ \vspace{1pt}
-    \small 
-    \BLOCK{ if phone }\VAR{phone} $|$ \BLOCK{ endif }
-    \BLOCK{ if email }\href{mailto:\VAR{email}}{\underline{\VAR{email}}} $|$ \BLOCK{ endif }
-    \BLOCK{ if linkedin }\href{\VAR{linkedin}}{\underline{\VAR{linkedin}}} $|$ \BLOCK{ endif }
-    \BLOCK{ if github }\href{\VAR{github}}{\underline{\VAR{github}}} $|$ \BLOCK{ endif }
-    \BLOCK{ if location }\VAR{location}\BLOCK{ endif }
+    \textbf{\Huge \scshape \VAR{full_name}} \\ \vspace{4pt}
+    \small \VAR{contact_line}
 \end{center}
 
 \BLOCK{ if summary }
@@ -122,14 +117,11 @@
     \resumeSubHeadingListStart
       \BLOCK{ for proj in projects }
       \resumeProjectHeading
-          {\textbf{\VAR{proj.title}}\BLOCK{ if proj.technologies } $|$ \emph{\VAR{proj.technologies}}\BLOCK{ endif }}{}
+          {\textbf{\VAR{proj.title}}\BLOCK{ if proj.technologies } $|$ \emph{\VAR{proj.technologies}}\BLOCK{ endif }}{\BLOCK{ if proj.link }\href{\VAR{proj.link}}{\underline{Link}}\BLOCK{ endif }}
           \resumeItemListStart
             \BLOCK{ if proj.description }
             \resumeItem{\VAR{proj.description}}
             \BLOCK{ endif }
-            \BLOCK{ for b in proj.bullets }
-            \resumeItem{\VAR{b}}
-            \BLOCK{ endfor }
           \resumeItemListEnd
       \BLOCK{ endfor }
     \resumeSubHeadingListEnd
@@ -141,10 +133,10 @@
  \begin{itemize}[leftmargin=0.15in, label={}]
     \small{\item{
      \BLOCK{ for cat in skill_categories }
-     \textbf{\VAR{cat.category_name}}{: \VAR{cat.skills|join(', ')}} \\
+     \textbf{\VAR{cat.category_name}}{: \VAR{cat.skills|join(', ')}}\BLOCK{ if not loop.last } \\ \BLOCK{ endif }
      \BLOCK{ endfor }
      \BLOCK{ if not skill_categories and skills }
-     \textbf{Skills}{: \VAR{skills|join(', ')}} \\
+     \textbf{Skills}{: \VAR{skills|join(', ')}}
      \BLOCK{ endif }
     }}
  \end{itemize}
