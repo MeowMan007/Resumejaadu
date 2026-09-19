@@ -145,6 +145,15 @@ def create_resume(request):
         if form.is_valid():
             resume = form.save(commit=False)
             resume.user = request.user
+            # Default or chosen template
+            tmpl_slug = request.POST.get("template_slug") or request.GET.get("template")
+            if tmpl_slug:
+                tmpl = ResumeTemplate.objects.filter(slug=tmpl_slug, is_active=True).first()
+                if tmpl:
+                    resume.template = tmpl
+            if not resume.template:
+                # Default to Jake's Resume as community gold-standard
+                resume.template = ResumeTemplate.objects.filter(slug="jakes-resume", is_active=True).first() or ResumeTemplate.objects.filter(is_active=True).first()
             resume.save()
             # Create blank PersonalInfo
             PersonalInfo.objects.get_or_create(
@@ -154,7 +163,22 @@ def create_resume(request):
             return redirect("resumes:wizard_step", pk=resume.pk, step="personal-info")
     else:
         form = ResumeCreateForm(initial={"title": "My Resume"})
-    return render(request, "resumes/create.html", {"form": form})
+
+    # Community favorite templates
+    community_slugs = ["jakes-resume", "faangpath-simple", "moderncv-classic", "swe-resume", "libre-cv"]
+    community_templates = list(ResumeTemplate.objects.filter(slug__in=community_slugs, is_active=True))
+    community_templates.sort(key=lambda t: community_slugs.index(t.slug) if t.slug in community_slugs else 99)
+    selected_template = request.GET.get("template", "jakes-resume")
+
+    return render(
+        request,
+        "resumes/create.html",
+        {
+            "form": form,
+            "community_templates": community_templates,
+            "selected_template": selected_template,
+        },
+    )
 
 
 # ─── Wizard Step Router ───────────────────────────────────────────────────────
@@ -248,39 +272,21 @@ def _step_experience(request, resume, step):
     if request.method == "POST":
         formset = ExperienceFS(request.POST, instance=resume)
         if formset.is_valid():
-            instances = formset.save()
-            # Process bullet sub-formsets for each saved experience
-            for i, exp_form in enumerate(formset.forms):
-                if exp_form.instance.pk and not exp_form.cleaned_data.get("DELETE"):
-                    bullet_fs = ExperienceBulletFormSet(
-                        request.POST,
-                        instance=exp_form.instance,
-                        prefix=f"bullets_{exp_form.instance.pk}",
-                    )
-                    if bullet_fs.is_valid():
-                        bullet_fs.save()
+            formset.save()
+            for form in formset.forms:
+                if form.instance.pk and not form.cleaned_data.get("DELETE") and hasattr(form, "_save_bullets"):
+                    form._save_bullets(form.instance)
             resume.current_step = max(resume.current_step, 3)
             resume.save(update_fields=["current_step"])
             if "save_and_continue" in request.POST:
                 return redirect("resumes:wizard_step", pk=resume.pk, step="education")
+            messages.success(request, "Experience saved.")
+            return redirect("resumes:wizard_step", pk=resume.pk, step="experience")
     else:
         formset = ExperienceFS(instance=resume)
 
-    # Attach bullet formsets to each experience form
-    experience_with_bullets = []
-    for form in formset.forms:
-        if form.instance.pk:
-            bullet_fs = ExperienceBulletFormSet(
-                instance=form.instance,
-                prefix=f"bullets_{form.instance.pk}",
-            )
-        else:
-            bullet_fs = None
-        experience_with_bullets.append((form, bullet_fs))
-
     ctx = _wizard_context(resume, step)
     ctx["formset"] = formset
-    ctx["experience_with_bullets"] = experience_with_bullets
     return render(request, "resumes/steps/experience.html", ctx)
 
 
@@ -294,6 +300,8 @@ def _step_education(request, resume, step):
             resume.save(update_fields=["current_step"])
             if "save_and_continue" in request.POST:
                 return redirect("resumes:wizard_step", pk=resume.pk, step="skills")
+            messages.success(request, "Education saved.")
+            return redirect("resumes:wizard_step", pk=resume.pk, step="education")
     else:
         formset = EducationFS(instance=resume)
     ctx = _wizard_context(resume, step)
@@ -311,6 +319,8 @@ def _step_skills(request, resume, step):
             resume.save(update_fields=["current_step"])
             if "save_and_continue" in request.POST:
                 return redirect("resumes:wizard_step", pk=resume.pk, step="projects")
+            messages.success(request, "Skills saved.")
+            return redirect("resumes:wizard_step", pk=resume.pk, step="skills")
     else:
         formset = SkillFS(instance=resume)
     ctx = _wizard_context(resume, step)
@@ -332,6 +342,8 @@ def _step_projects(request, resume, step):
             resume.save(update_fields=["current_step"])
             if "save_and_continue" in request.POST:
                 return redirect("resumes:wizard_step", pk=resume.pk, step="certifications")
+            messages.success(request, "Projects saved.")
+            return redirect("resumes:wizard_step", pk=resume.pk, step="projects")
     else:
         formset = ProjectFS(instance=resume)
     ctx = _wizard_context(resume, step)
@@ -349,6 +361,8 @@ def _step_certifications(request, resume, step):
             resume.save(update_fields=["current_step"])
             if "save_and_continue" in request.POST:
                 return redirect("resumes:wizard_step", pk=resume.pk, step="template")
+            messages.success(request, "Certifications saved.")
+            return redirect("resumes:wizard_step", pk=resume.pk, step="certifications")
     else:
         formset = CertFS(instance=resume)
     ctx = _wizard_context(resume, step)
@@ -372,6 +386,11 @@ def _step_template(request, resume, step):
             except ResumeTemplate.DoesNotExist:
                 messages.error(request, "Invalid template selected.")
 
+    # Community favorite templates
+    community_slugs = ["jakes-resume", "faangpath-simple", "moderncv-classic", "swe-resume", "libre-cv"]
+    community_templates = [t for t in templates if t.slug in community_slugs]
+    community_templates.sort(key=lambda t: community_slugs.index(t.slug))
+
     # Group templates by category
     categories = {}
     for tmpl in templates:
@@ -380,6 +399,7 @@ def _step_template(request, resume, step):
 
     ctx = _wizard_context(resume, step)
     ctx["templates"] = templates
+    ctx["community_templates"] = community_templates
     ctx["categories"] = categories
     return render(request, "resumes/steps/template_gallery.html", ctx)
 
