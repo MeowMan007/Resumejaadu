@@ -6,25 +6,35 @@
   {% csrf_token %}
   {{ formset.management_form }}
 
-  <div class="space-y-5" id="education-container">
+  <div style="display:flex; flex-direction:column; gap:20px;" id="education-container">
     {% for form in formset %}
-    <div class="rounded-xl p-5 space-y-4"
-         style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);">
+    <div class="formset-entry card-entry" style="background:var(--black-3); border:1px solid var(--black-4); border-radius:8px; padding:20px; position:relative;">
 
-      {% if form.instance.pk %}
-      <div class="flex justify-end">
-        <label class="flex items-center gap-2 text-xs text-red-400 cursor-pointer">
-          {{ form.DELETE }} Remove
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <h4 style="font-size:14px; font-weight:600; color:var(--yellow);">
+          {% if form.instance.degree and form.instance.institution %}
+            {{ form.instance.degree }} - {{ form.instance.institution }}
+          {% else %}
+            Education Entry
+          {% endif %}
+        </h4>
+        {% if form.instance.pk %}
+        <label style="font-size:12px; color:var(--red); cursor:pointer; display:inline-flex; align-items:center; gap:4px;">
+          {{ form.DELETE }} Delete entry
         </label>
+        {% else %}
+        <button type="button" class="btn btn-ghost btn-sm remove-entry-btn" style="color:var(--red); font-size:12px; padding:2px 8px;">
+          ✕ Remove
+        </button>
+        {% endif %}
       </div>
-      {% endif %}
 
       {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
       {{ form.order }}
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div class="grid grid-2 mb-4">
         <div>
-          <label class="form-label">Institution</label>
+          <label class="form-label">Institution / University</label>
           {{ form.institution }}
           {% if form.institution.errors %}<p class="form-error">{{ form.institution.errors|join:", " }}</p>{% endif %}
         </div>
@@ -35,7 +45,7 @@
         </div>
       </div>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div class="grid grid-2 mb-4">
         <div>
           <label class="form-label">Field of Study</label>
           {{ form.field_of_study }}
@@ -46,7 +56,7 @@
         </div>
       </div>
 
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div class="grid grid-3">
         <div>
           <label class="form-label">Start Date</label>
           {{ form.start_date }}
@@ -54,23 +64,109 @@
         <div>
           <label class="form-label">End Date</label>
           {{ form.end_date }}
-          <label class="flex items-center gap-2 mt-1 text-xs text-slate-400">
+          <label style="display:flex; align-items:center; gap:6px; font-size:12px; color:var(--gray); margin-top:4px;">
             {{ form.is_current }} Currently enrolled
           </label>
         </div>
         <div>
-          <label class="form-label">GPA <span class="text-slate-500 font-normal">(optional)</span></label>
+          <label class="form-label">GPA <span style="color:var(--gray); font-weight:400;">(optional)</span></label>
           {{ form.gpa }}
         </div>
       </div>
     </div>
-    {% empty %}
-    <p class="text-center text-slate-500 py-6">No education entries yet.</p>
     {% endfor %}
   </div>
 
-  <div class="mt-4 flex justify-end">
-    <button type="submit" name="save_draft" value="1" class="btn-secondary text-sm">Save Draft</button>
+  <div class="flex justify-between items-center mt-6">
+    <button type="button" id="add-education-btn" class="btn btn-outline btn-sm">
+      + Add Another Education
+    </button>
+    <button type="submit" name="save_draft" value="1" class="btn btn-outline btn-sm">
+      Save Draft
+    </button>
   </div>
 </form>
+
+<!-- Empty Template for dynamic adding -->
+<template id="empty-education-template">
+  <div class="formset-entry card-entry" style="background:var(--black-3); border:1px solid var(--black-4); border-radius:8px; padding:20px; margin-top:20px; position:relative;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+      <h4 style="font-size:14px; font-weight:600; color:var(--yellow);">New Education</h4>
+      <button type="button" class="btn btn-ghost btn-sm remove-entry-btn" style="color:var(--red); font-size:12px; padding:2px 8px;">
+        ✕ Remove
+      </button>
+    </div>
+
+    {% for hidden in formset.empty_form.hidden_fields %}{{ hidden }}{% endfor %}
+    {{ formset.empty_form.order }}
+
+    <div class="grid grid-2 mb-4">
+      <div>
+        <label class="form-label">Institution / University</label>
+        {{ formset.empty_form.institution }}
+      </div>
+      <div>
+        <label class="form-label">Degree</label>
+        {{ formset.empty_form.degree }}
+      </div>
+    </div>
+
+    <div class="grid grid-2 mb-4">
+      <div>
+        <label class="form-label">Field of Study</label>
+        {{ formset.empty_form.field_of_study }}
+      </div>
+      <div>
+        <label class="form-label">Location</label>
+        {{ formset.empty_form.location }}
+      </div>
+    </div>
+
+    <div class="grid grid-3">
+      <div>
+        <label class="form-label">Start Date</label>
+        {{ formset.empty_form.start_date }}
+      </div>
+      <div>
+        <label class="form-label">End Date</label>
+        {{ formset.empty_form.end_date }}
+        <label style="display:flex; align-items:center; gap:6px; font-size:12px; color:var(--gray); margin-top:4px;">
+          {{ formset.empty_form.is_current }} Currently enrolled
+        </label>
+      </div>
+      <div>
+        <label class="form-label">GPA <span style="color:var(--gray); font-weight:400;">(optional)</span></label>
+        {{ formset.empty_form.gpa }}
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const container = document.getElementById('education-container');
+  const addBtn = document.getElementById('add-education-btn');
+  const template = document.getElementById('empty-education-template');
+  const totalForms = document.getElementById('id_{{ formset.prefix }}-TOTAL_FORMS');
+
+  container.addEventListener('click', (e) => {
+    if (e.target.classList.contains('remove-entry-btn')) {
+      const entry = e.target.closest('.formset-entry');
+      if (entry) entry.remove();
+    }
+  });
+
+  if (addBtn && template && totalForms) {
+    addBtn.addEventListener('click', () => {
+      const formIdx = parseInt(totalForms.value, 10);
+      const clone = template.content.cloneNode(true);
+      const wrapper = clone.firstElementChild;
+      
+      wrapper.innerHTML = wrapper.innerHTML.replace(/__prefix__/g, formIdx);
+      container.appendChild(clone);
+      totalForms.value = formIdx + 1;
+    });
+  }
+});
+</script>
 {% endblock %}

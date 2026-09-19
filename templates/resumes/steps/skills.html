@@ -6,50 +6,114 @@
   {% csrf_token %}
   {{ formset.management_form }}
 
-  <p class="text-slate-400 text-sm mb-4">
-    Group your skills by category (e.g. Languages, Frameworks, Tools). Enter each skill comma-separated.
+  <p class="t-small mb-4">
+    Group your skills by category (e.g. Languages, Frameworks, Developer Tools, Databases). Enter each skill separated by commas.
   </p>
 
-  <div class="space-y-4" id="skills-container">
+  <div style="display:flex; flex-direction:column; gap:16px;" id="skills-container">
     {% for form in formset %}
-    <div class="rounded-xl p-4 space-y-3"
-         style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);">
+    <div class="formset-entry card-entry" style="background:var(--black-3); border:1px solid var(--black-4); border-radius:8px; padding:16px; position:relative;">
 
-      {% if form.instance.pk %}
-      <div class="flex justify-end">
-        <label class="flex items-center gap-2 text-xs text-red-400 cursor-pointer">
-          {{ form.DELETE }} Remove category
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+        <h4 style="font-size:13px; font-weight:600; color:var(--yellow);">
+          {% if form.instance.name %}{{ form.instance.name }}{% else %}Skill Category{% endif %}
+        </h4>
+        {% if form.instance.pk %}
+        <label style="font-size:12px; color:var(--red); cursor:pointer; display:inline-flex; align-items:center; gap:4px;">
+          {{ form.DELETE }} Delete category
         </label>
+        {% else %}
+        <button type="button" class="btn btn-ghost btn-sm remove-entry-btn" style="color:var(--red); font-size:12px; padding:2px 8px;">
+          ✕ Remove
+        </button>
+        {% endif %}
       </div>
-      {% endif %}
 
       {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
       {{ form.order }}
 
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
+      <div class="grid grid-3" style="align-items:end;">
         <div>
-          <label class="form-label text-sm">Category Name</label>
+          <label class="form-label">Category Name</label>
           {{ form.name }}
           {% if form.name.errors %}<p class="form-error">{{ form.name.errors|join:", " }}</p>{% endif %}
         </div>
-        <div class="sm:col-span-2">
-          <label class="form-label text-sm">Skills <span class="text-slate-500 font-normal">(comma-separated)</span></label>
+        <div style="grid-column: span 2;">
+          <label class="form-label">Skills <span style="color:var(--gray); font-weight:400;">(comma-separated)</span></label>
           {{ form.items_text }}
         </div>
       </div>
     </div>
-    {% empty %}
-    <p class="text-center text-slate-500 py-4">No skill categories yet.</p>
     {% endfor %}
   </div>
 
-  <div class="mt-4 text-xs text-slate-500 p-3 rounded-lg"
-       style="background: rgba(99,102,241,0.06); border: 1px solid rgba(99,102,241,0.15);">
-    💡 <strong class="text-slate-300">Tip:</strong> ATS parsers love skill sections. Add at least one category with 5+ skills relevant to your target role.
+  <div style="background:var(--black-3); border:1px solid rgba(232,185,49,0.15); border-radius:6px; padding:12px 16px; margin-top:20px;">
+    <p class="t-small">
+      <strong style="color:var(--yellow);">Tip:</strong> ATS parsers love skill sections. Add at least one category with 5+ skills (e.g. "Languages: Python, TypeScript, Java, SQL").
+    </p>
   </div>
 
-  <div class="mt-4 flex justify-end">
-    <button type="submit" name="save_draft" value="1" class="btn-secondary text-sm">Save Draft</button>
+  <div class="flex justify-between items-center mt-6">
+    <button type="button" id="add-skill-btn" class="btn btn-outline btn-sm">
+      + Add Another Skill Category
+    </button>
+    <button type="submit" name="save_draft" value="1" class="btn btn-outline btn-sm">
+      Save Draft
+    </button>
   </div>
 </form>
+
+<!-- Empty Template for dynamic adding -->
+<template id="empty-skill-template">
+  <div class="formset-entry card-entry" style="background:var(--black-3); border:1px solid var(--black-4); border-radius:8px; padding:16px; margin-top:16px; position:relative;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+      <h4 style="font-size:13px; font-weight:600; color:var(--yellow);">New Skill Category</h4>
+      <button type="button" class="btn btn-ghost btn-sm remove-entry-btn" style="color:var(--red); font-size:12px; padding:2px 8px;">
+        ✕ Remove
+      </button>
+    </div>
+
+    {% for hidden in formset.empty_form.hidden_fields %}{{ hidden }}{% endfor %}
+    {{ formset.empty_form.order }}
+
+    <div class="grid grid-3" style="align-items:end;">
+      <div>
+        <label class="form-label">Category Name</label>
+        {{ formset.empty_form.name }}
+      </div>
+      <div style="grid-column: span 2;">
+        <label class="form-label">Skills <span style="color:var(--gray); font-weight:400;">(comma-separated)</span></label>
+        {{ formset.empty_form.items_text }}
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const container = document.getElementById('skills-container');
+  const addBtn = document.getElementById('add-skill-btn');
+  const template = document.getElementById('empty-skill-template');
+  const totalForms = document.getElementById('id_{{ formset.prefix }}-TOTAL_FORMS');
+
+  container.addEventListener('click', (e) => {
+    if (e.target.classList.contains('remove-entry-btn')) {
+      const entry = e.target.closest('.formset-entry');
+      if (entry) entry.remove();
+    }
+  });
+
+  if (addBtn && template && totalForms) {
+    addBtn.addEventListener('click', () => {
+      const formIdx = parseInt(totalForms.value, 10);
+      const clone = template.content.cloneNode(true);
+      const wrapper = clone.firstElementChild;
+      
+      wrapper.innerHTML = wrapper.innerHTML.replace(/__prefix__/g, formIdx);
+      container.appendChild(clone);
+      totalForms.value = formIdx + 1;
+    });
+  }
+});
+</script>
 {% endblock %}

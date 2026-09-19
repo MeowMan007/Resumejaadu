@@ -6,51 +6,124 @@
   {% csrf_token %}
   {{ formset.management_form }}
 
-  <div class="space-y-4" id="certs-container">
+  <div style="display:flex; flex-direction:column; gap:16px;" id="certs-container">
     {% for form in formset %}
-    <div class="rounded-xl p-4 space-y-3"
-         style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);">
+    <div class="formset-entry card-entry" style="background:var(--black-3); border:1px solid var(--black-4); border-radius:8px; padding:16px; position:relative;">
 
-      {% if form.instance.pk %}
-      <div class="flex justify-end">
-        <label class="flex items-center gap-2 text-xs text-red-400 cursor-pointer">
-          {{ form.DELETE }} Remove
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+        <h4 style="font-size:13px; font-weight:600; color:var(--yellow);">
+          {% if form.instance.name %}{{ form.instance.name }}{% else %}Certification Entry{% endif %}
+        </h4>
+        {% if form.instance.pk %}
+        <label style="font-size:12px; color:var(--red); cursor:pointer; display:inline-flex; align-items:center; gap:4px;">
+          {{ form.DELETE }} Delete entry
         </label>
+        {% else %}
+        <button type="button" class="btn btn-ghost btn-sm remove-entry-btn" style="color:var(--red); font-size:12px; padding:2px 8px;">
+          ✕ Remove
+        </button>
+        {% endif %}
       </div>
-      {% endif %}
 
       {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <div class="grid grid-2 mb-4">
         <div>
-          <label class="form-label text-sm">Certification Name</label>
+          <label class="form-label">Certification Name</label>
           {{ form.name }}
           {% if form.name.errors %}<p class="form-error">{{ form.name.errors|join:", " }}</p>{% endif %}
         </div>
         <div>
-          <label class="form-label text-sm">Issuer</label>
+          <label class="form-label">Issuer</label>
           {{ form.issuer }}
         </div>
       </div>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <div class="grid grid-2">
         <div>
-          <label class="form-label text-sm">Date</label>
+          <label class="form-label">Date</label>
           {{ form.date }}
         </div>
         <div>
-          <label class="form-label text-sm">Credential URL <span class="text-slate-500 font-normal">(optional)</span></label>
+          <label class="form-label">Credential URL <span style="color:var(--gray); font-weight:400;">(optional)</span></label>
           {{ form.credential_url }}
         </div>
       </div>
     </div>
-    {% empty %}
-    <p class="text-center text-slate-500 py-6">No certifications yet.</p>
     {% endfor %}
   </div>
 
-  <div class="mt-4 flex justify-end">
-    <button type="submit" name="save_draft" value="1" class="btn-secondary text-sm">Save Draft</button>
+  <div class="flex justify-between items-center mt-6">
+    <button type="button" id="add-cert-btn" class="btn btn-outline btn-sm">
+      + Add Another Certification
+    </button>
+    <button type="submit" name="save_draft" value="1" class="btn btn-outline btn-sm">
+      Save Draft
+    </button>
   </div>
 </form>
+
+<!-- Empty Template for dynamic adding -->
+<template id="empty-cert-template">
+  <div class="formset-entry card-entry" style="background:var(--black-3); border:1px solid var(--black-4); border-radius:8px; padding:16px; margin-top:16px; position:relative;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+      <h4 style="font-size:13px; font-weight:600; color:var(--yellow);">New Certification</h4>
+      <button type="button" class="btn btn-ghost btn-sm remove-entry-btn" style="color:var(--red); font-size:12px; padding:2px 8px;">
+        ✕ Remove
+      </button>
+    </div>
+
+    {% for hidden in formset.empty_form.hidden_fields %}{{ hidden }}{% endfor %}
+
+    <div class="grid grid-2 mb-4">
+      <div>
+        <label class="form-label">Certification Name</label>
+        {{ formset.empty_form.name }}
+      </div>
+      <div>
+        <label class="form-label">Issuer</label>
+        {{ formset.empty_form.issuer }}
+      </div>
+    </div>
+
+    <div class="grid grid-2">
+      <div>
+        <label class="form-label">Date</label>
+        {{ formset.empty_form.date }}
+      </div>
+      <div>
+        <label class="form-label">Credential URL <span style="color:var(--gray); font-weight:400;">(optional)</span></label>
+        {{ formset.empty_form.credential_url }}
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const container = document.getElementById('certs-container');
+  const addBtn = document.getElementById('add-cert-btn');
+  const template = document.getElementById('empty-cert-template');
+  const totalForms = document.getElementById('id_{{ formset.prefix }}-TOTAL_FORMS');
+
+  container.addEventListener('click', (e) => {
+    if (e.target.classList.contains('remove-entry-btn')) {
+      const entry = e.target.closest('.formset-entry');
+      if (entry) entry.remove();
+    }
+  });
+
+  if (addBtn && template && totalForms) {
+    addBtn.addEventListener('click', () => {
+      const formIdx = parseInt(totalForms.value, 10);
+      const clone = template.content.cloneNode(true);
+      const wrapper = clone.firstElementChild;
+      
+      wrapper.innerHTML = wrapper.innerHTML.replace(/__prefix__/g, formIdx);
+      container.appendChild(clone);
+      totalForms.value = formIdx + 1;
+    });
+  }
+});
+</script>
 {% endblock %}

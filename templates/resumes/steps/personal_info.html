@@ -2,31 +2,31 @@
 {% block title %}Personal Info — {{ resume.title }}{% endblock %}
 
 {% block step_content %}
-<form method="post" enctype="multipart/form-data" id="wizard-form" class="space-y-6">
+<form method="post" enctype="multipart/form-data" id="wizard-form">
   {% csrf_token %}
 
   {% if form.non_field_errors %}
-  <div class="rounded-lg bg-red-900/30 border border-red-800 px-4 py-3 text-sm text-red-300">
+  <div style="padding:10px 14px; border-radius:6px; border:1px solid rgba(229,75,75,0.3); color:var(--red); font-size:13px; margin-bottom:16px;">
     {{ form.non_field_errors }}
   </div>
   {% endif %}
 
-  <!-- Name + Email row -->
-  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+  <!-- Name + Email -->
+  <div class="grid grid-2 mb-4">
     <div>
-      <label for="id_full_name" class="form-label">Full Name <span class="text-red-400">*</span></label>
+      <label for="id_full_name" class="form-label">Full Name <span style="color:var(--red)">*</span></label>
       {{ form.full_name }}
       {% if form.full_name.errors %}<p class="form-error">{{ form.full_name.errors|join:", " }}</p>{% endif %}
     </div>
     <div>
-      <label for="id_email" class="form-label">Email <span class="text-red-400">*</span></label>
+      <label for="id_email" class="form-label">Email <span style="color:var(--red)">*</span></label>
       {{ form.email }}
       {% if form.email.errors %}<p class="form-error">{{ form.email.errors|join:", " }}</p>{% endif %}
     </div>
   </div>
 
-  <!-- Phone + Location row -->
-  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+  <!-- Phone + Location -->
+  <div class="grid grid-2 mb-4">
     <div>
       <label for="id_phone" class="form-label">Phone</label>
       {{ form.phone }}
@@ -37,8 +37,8 @@
     </div>
   </div>
 
-  <!-- Social links -->
-  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+  <!-- Social -->
+  <div class="grid grid-3 mb-4">
     <div>
       <label for="id_linkedin_url" class="form-label">LinkedIn</label>
       {{ form.linkedin_url }}
@@ -53,12 +53,12 @@
     </div>
   </div>
 
-  <!-- Summary with AI enhance button -->
-  <div>
-    <div class="flex items-center justify-between mb-1">
-      <label for="id_summary" class="form-label mb-0">Professional Summary</label>
+  <!-- Summary -->
+  <div style="margin-bottom: 16px;">
+    <div class="flex justify-between items-center" style="margin-bottom:6px;">
+      <label for="id_summary" class="form-label" style="margin-bottom:0;">Professional Summary</label>
       <button type="button" id="ai-summary-btn"
-              class="ai-btn text-xs"
+              class="btn-ai"
               hx-post="{% url 'ai_assistant:enhance_summary' %}"
               hx-vals='{"field_id": "id_summary", "target_role": "{{ resume.target_role }}"}'
               hx-include="[name='summary']"
@@ -66,40 +66,36 @@
               hx-swap="outerHTML"
               hx-indicator="#ai-summary-spinner">
         <span id="ai-summary-spinner" class="htmx-indicator">⏳</span>
-        ✨ Improve with AI
+        AI Improve
       </button>
     </div>
     {{ form.summary }}
     {% if form.summary.errors %}<p class="form-error">{{ form.summary.errors|join:", " }}</p>{% endif %}
-    <p class="mt-1 text-xs text-slate-500">2–3 sentences. AI can help you write this.</p>
+    <p class="t-small mt-1">2–3 sentences. AI can help write this.</p>
   </div>
 
-  <!-- Photo upload -->
-  <div>
-    <label class="form-label">Headshot Photo <span class="text-slate-500 font-normal">(optional)</span></label>
-    <div class="flex items-center gap-4">
+  <!-- Photo -->
+  <div style="margin-bottom: 16px;">
+    <label class="form-label">Headshot <span style="color:var(--gray); font-weight:400;">(optional)</span></label>
+    <div class="flex items-center gap-3">
       {% if form.instance.photo %}
-        <img src="{{ form.instance.photo.url }}" alt="Current photo"
-             class="w-16 h-16 rounded-full object-cover border-2 border-brand-500/30" />
+        <img src="{{ form.instance.photo.url }}" alt="Photo"
+             style="width:48px; height:48px; border-radius:6px; object-fit:cover; border: 1px solid var(--black-4);" />
       {% else %}
-        <div class="w-16 h-16 rounded-full flex items-center justify-center text-2xl"
-             style="background: rgba(99,102,241,0.12); border: 1px dashed rgba(99,102,241,0.3);">
+        <div style="width:48px; height:48px; border-radius:6px; background:var(--black-3); border:1px dashed var(--black-4); display:flex; align-items:center; justify-content:center; font-size:20px; color:var(--gray);">
           👤
         </div>
       {% endif %}
       <div>
         {{ form.photo }}
         {% if form.photo.errors %}<p class="form-error">{{ form.photo.errors|join:", " }}</p>{% endif %}
-        <p class="mt-1 text-xs text-slate-500">JPEG/PNG/WebP · Max 5MB · Only for photo-supporting templates.</p>
+        <p class="t-small mt-1">JPEG/PNG/WebP · Max 5MB</p>
       </div>
     </div>
   </div>
 
-  <!-- Save only button -->
-  <div class="flex justify-end">
-    <button type="submit" name="save_draft" value="1" class="btn-secondary text-sm">
-      Save Draft
-    </button>
+  <div style="text-align: right;">
+    <button type="submit" name="save_draft" value="1" class="btn btn-outline btn-sm">Save Draft</button>
   </div>
 </form>
 {% endblock %}

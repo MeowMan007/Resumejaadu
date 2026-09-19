@@ -6,23 +6,33 @@
   {% csrf_token %}
   {{ formset.management_form }}
 
-  <div class="space-y-5" id="projects-container">
+  <div style="display:flex; flex-direction:column; gap:20px;" id="projects-container">
     {% for form in formset %}
-    <div class="rounded-xl p-5 space-y-4"
-         style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07);">
+    <div class="formset-entry card-entry" style="background:var(--black-3); border:1px solid var(--black-4); border-radius:8px; padding:20px; position:relative;">
 
-      {% if form.instance.pk %}
-      <div class="flex justify-end">
-        <label class="flex items-center gap-2 text-xs text-red-400 cursor-pointer">
-          {{ form.DELETE }} Remove
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <h4 style="font-size:14px; font-weight:600; color:var(--yellow);">
+          {% if form.instance.name %}
+            {{ form.instance.name }}
+          {% else %}
+            Project Entry
+          {% endif %}
+        </h4>
+        {% if form.instance.pk %}
+        <label style="font-size:12px; color:var(--red); cursor:pointer; display:inline-flex; align-items:center; gap:4px;">
+          {{ form.DELETE }} Delete entry
         </label>
+        {% else %}
+        <button type="button" class="btn btn-ghost btn-sm remove-entry-btn" style="color:var(--red); font-size:12px; padding:2px 8px;">
+          ✕ Remove
+        </button>
+        {% endif %}
       </div>
-      {% endif %}
 
       {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
       {{ form.order }}
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <div class="grid grid-2 mb-4">
         <div>
           <label class="form-label">Project Name</label>
           {{ form.name }}
@@ -34,36 +44,101 @@
         </div>
       </div>
 
-      <div>
-        <label class="form-label">Project Link <span class="text-slate-500 font-normal">(optional)</span></label>
+      <div style="margin-bottom:16px;">
+        <label class="form-label">Project Link <span style="color:var(--gray); font-weight:400;">(optional)</span></label>
         {{ form.link }}
       </div>
 
       <div>
-        <div class="flex items-center justify-between mb-1">
-          <label class="form-label mb-0">Description</label>
-          {% if form.instance.pk %}
-          <button type="button" class="ai-btn text-xs"
+        <div class="flex justify-between items-center" style="margin-bottom:6px;">
+          <label class="form-label" style="margin-bottom:0;">Description / Impact</label>
+          <button type="button" class="btn-ai"
                   hx-post="{% url 'ai_assistant:enhance_project' %}"
                   hx-vals='js:{"field_id": "{{ form.description.id_for_label }}", "text": document.getElementById("{{ form.description.id_for_label }}").value, "name": document.getElementById("{{ form.name.id_for_label }}").value, "tech_stack": document.getElementById("{{ form.tech_stack.id_for_label }}").value}'
                   hx-target="#{{ form.description.id_for_label }}"
                   hx-swap="outerHTML">
             ✨ AI Improve
           </button>
-          {% endif %}
         </div>
-        <div id="desc_{{ form.instance.pk|default:'new' }}">
+        <div>
           {{ form.description }}
         </div>
       </div>
     </div>
-    {% empty %}
-    <p class="text-center text-slate-500 py-6">No projects yet. Add your side projects and open-source contributions.</p>
     {% endfor %}
   </div>
 
-  <div class="mt-4 flex justify-end">
-    <button type="submit" name="save_draft" value="1" class="btn-secondary text-sm">Save Draft</button>
+  <div class="flex justify-between items-center mt-6">
+    <button type="button" id="add-project-btn" class="btn btn-outline btn-sm">
+      + Add Another Project
+    </button>
+    <button type="submit" name="save_draft" value="1" class="btn btn-outline btn-sm">
+      Save Draft
+    </button>
   </div>
 </form>
+
+<!-- Empty Template for dynamic adding -->
+<template id="empty-project-template">
+  <div class="formset-entry card-entry" style="background:var(--black-3); border:1px solid var(--black-4); border-radius:8px; padding:20px; margin-top:20px; position:relative;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+      <h4 style="font-size:14px; font-weight:600; color:var(--yellow);">New Project</h4>
+      <button type="button" class="btn btn-ghost btn-sm remove-entry-btn" style="color:var(--red); font-size:12px; padding:2px 8px;">
+        ✕ Remove
+      </button>
+    </div>
+
+    {% for hidden in formset.empty_form.hidden_fields %}{{ hidden }}{% endfor %}
+    {{ formset.empty_form.order }}
+
+    <div class="grid grid-2 mb-4">
+      <div>
+        <label class="form-label">Project Name</label>
+        {{ formset.empty_form.name }}
+      </div>
+      <div>
+        <label class="form-label">Tech Stack</label>
+        {{ formset.empty_form.tech_stack }}
+      </div>
+    </div>
+
+    <div style="margin-bottom:16px;">
+      <label class="form-label">Project Link <span style="color:var(--gray); font-weight:400;">(optional)</span></label>
+      {{ formset.empty_form.link }}
+    </div>
+
+    <div>
+      <label class="form-label">Description / Impact</label>
+      {{ formset.empty_form.description }}
+    </div>
+  </div>
+</template>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const container = document.getElementById('projects-container');
+  const addBtn = document.getElementById('add-project-btn');
+  const template = document.getElementById('empty-project-template');
+  const totalForms = document.getElementById('id_{{ formset.prefix }}-TOTAL_FORMS');
+
+  container.addEventListener('click', (e) => {
+    if (e.target.classList.contains('remove-entry-btn')) {
+      const entry = e.target.closest('.formset-entry');
+      if (entry) entry.remove();
+    }
+  });
+
+  if (addBtn && template && totalForms) {
+    addBtn.addEventListener('click', () => {
+      const formIdx = parseInt(totalForms.value, 10);
+      const clone = template.content.cloneNode(true);
+      const wrapper = clone.firstElementChild;
+      
+      wrapper.innerHTML = wrapper.innerHTML.replace(/__prefix__/g, formIdx);
+      container.appendChild(clone);
+      totalForms.value = formIdx + 1;
+    });
+  }
+});
+</script>
 {% endblock %}
